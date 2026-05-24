@@ -69,3 +69,77 @@ npm run build
 - Developed locally as a personal productivity tool; repository created after reaching a stable MVP
 - Firebase Storage intentionally not used — background images stored as URLs in Firestore (stays on free tier)
 - Firestore security rules restrict every user to their own data only
+
+---
+
+# Mindes (на русском)
+
+Иерархический менеджер задач в виде PWA + Android-приложения. Создан для личного использования — быстрый, работает офлайн, ориентирован на мобильные устройства.
+
+## Возможности
+
+- **Проекты** — каждый проект это карточка с цветом, описанием, сроком и приоритетом
+- **Дерево задач** — неограниченная вложенность: переходи в любую задачу и смотри её подзадачи
+- **Статистика ветки** — на десктопе боковая панель показывает прогресс, приоритеты и ближайшие дедлайны
+- **Сегодня / Архив** — быстрый просмотр просроченных, сегодняшних и задач на неделю по всем проектам
+- **Повторяющиеся задачи** — ежедневно, еженедельно, ежемесячно или каждые N дней; срок переносится автоматически при выполнении
+- **Чеклисты** — подпункты внутри задачи с прогресс-баром
+- **Напоминания** — push-уведомления через Web Notifications API
+- **Фон** — установка фонового изображения по ссылке
+- **Тёмная / светлая тема** — сохраняется, без мигания при загрузке
+- **PWA** — устанавливается, работает офлайн, service worker со стратегией stale-while-revalidate
+- **Android** — собирается через Capacitor
+
+## Стек
+
+| Слой | Технология |
+|---|---|
+| UI | React 18 + Vite |
+| Данные | Firebase Firestore (офлайн-кеш) |
+| Авторизация | Firebase Auth (Google) |
+| PWA | Кастомный service worker |
+| Android | Capacitor 6 |
+| Хостинг | Firebase Hosting |
+
+## Структура проекта
+
+```
+src/
+  App.jsx              # Роутер + оболочка авторизации
+  Mindmap.jsx          # Вид дерева задач (основная фича)
+  ProjectsHome.jsx     # Сетка проектов + оверлеи
+  BackgroundPanel.jsx  # Выбор фона
+  utils.js             # Чистые функции и tree-хелперы
+  hooks.js             # Общие React-хуки
+  background.js        # Сохранение фона
+  sync.js              # Синхронизация с Firestore
+  auth.js              # Обёртка Firebase Auth
+  theme.js             # Тема + хук
+  notifications.js     # Планировщик уведомлений
+  firebase.js          # Инициализация Firebase
+```
+
+## Запуск
+
+```bash
+# 1. Клонировать и установить зависимости
+git clone https://github.com/YOUR_USERNAME/mindes.git
+cd mindes
+npm install
+
+# 2. Настроить Firebase
+cp .env.example .env.local
+# Заполнить ключами своего Firebase-проекта
+
+# 3. Запустить dev-сервер
+npm run dev
+
+# 4. Собрать для веба
+npm run build
+```
+
+## Примечания
+
+- Разрабатывался локально как личный инструмент; репозиторий создан после выхода стабильного MVP
+- Firebase Storage намеренно не используется — фоновые изображения хранятся как URL в Firestore (бесплатный тариф)
+- Правила безопасности Firestore ограничивают каждого пользователя только его собственными данными
