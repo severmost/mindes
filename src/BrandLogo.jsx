@@ -9,7 +9,6 @@ export default function BrandLogo({ size = 32, fontSize = 17, onClick, style }) 
       onClick={onClick}
       style={{
         display: "flex", alignItems: "center", gap: 8, flexShrink: 0,
-        userSelect: "none",
         cursor: onClick ? "pointer" : "default",
         ...style,
       }}

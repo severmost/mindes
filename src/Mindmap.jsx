@@ -553,7 +553,6 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
               : `0 2px 10px ${c.bg}18, 0 1px 3px rgba(0,0,0,0.06)`)
           : "none",
         cursor: "pointer",
-        userSelect: "none", WebkitUserSelect: "none",
         WebkitTapHighlightColor: "transparent",
         opacity: ad ? 0.48 : 1,
         transition: "opacity .15s",
@@ -653,7 +652,7 @@ function ChildColumn({ child, childIdx, onNavigate, onNavigateGc, onEdit, theme,
         onDone={() => onDone?.(child.id)} />
       {visGC.length > 0 && (
         <>
-          <div style={{ textAlign: "center", color: color.bg + "80", fontSize: 13, padding: "3px 0 2px", userSelect: "none", lineHeight: 1 }}>▾</div>
+          <div style={{ textAlign: "center", color: color.bg + "80", fontSize: 13, padding: "3px 0 2px", lineHeight: 1 }}>▾</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             {shownGC.map((gc, j) => (
               <NodeCard key={gc.id} node={gc} colorIdx={getNodeColor(gc, colorIdx, j)} level={2}
@@ -933,7 +932,7 @@ export default function Mindmap({
           {visChildren.length > 0 && (
             <div style={{ display: "flex", justifyContent: "space-around", padding: "8px 0 4px", gap: 4 }}>
               {Array.from({ length: Math.min(visChildren.length, numCols * 2) }).map((_, i) => (
-                <span key={i} style={{ color: centerColor.bg + "66", fontSize: 16, userSelect: "none", lineHeight: 1 }}>▾</span>
+                <span key={i} style={{ color: centerColor.bg + "66", fontSize: 16, lineHeight: 1 }}>▾</span>
               ))}
             </div>
           )}

@@ -1,4 +1,16 @@
 /* ──────────────────────────────────────────────────────────────
+   Text selection — disabled globally, enabled only in inputs
+────────────────────────────────────────────────────────────── */
+* {
+  user-select: none;
+  -webkit-user-select: none;
+}
+input, textarea, [contenteditable] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ──────────────────────────────────────────────────────────────
    Global animations (supplement to index.html)
 ────────────────────────────────────────────────────────────── */
 @keyframes panelIn {

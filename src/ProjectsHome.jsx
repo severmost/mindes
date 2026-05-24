@@ -197,8 +197,6 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
         minHeight: isDesktop ? 210 : 150,
         display: "flex",
         flexDirection: "column",
-        userSelect: "none",
-        WebkitUserSelect: "none",
         WebkitTapHighlightColor: "transparent",
         boxShadow: theme.name === "dark"
           ? "0 2px 12px rgba(0,0,0,0.28)"
