@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
+import { boostTheme } from "./theme";
 import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
@@ -466,7 +467,8 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
 
 // ── Main component ──
-export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel }) {
+export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel }) {
+  const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [editing, setEditing] = useState(null);
   const [overlayMode, setOverlayMode] = useState(initialOverlay || null);
 

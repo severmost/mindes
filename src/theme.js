@@ -148,6 +148,37 @@ export function useTheme() {
   };
 }
 
+/**
+ * Возвращает тему с усиленным контрастом приглушённых цветов для случая,
+ * когда активен фон-оверлей.
+ *
+ * Тёмная тема: оверлей затемняет → dim-цвета делаем светлее.
+ * Светлая тема: оверлей засветляет → dim-цвета делаем темнее.
+ */
+export function boostTheme(t) {
+  if (t.name === "dark") {
+    return {
+      ...t,
+      textDim:      "#ccc",
+      textMuted:    "#aaa",
+      textHint:     "#777",
+      textFaint:    "#888",
+      sectionLabel: "#999",
+      btnTextDim:   "#999",
+    };
+  } else {
+    return {
+      ...t,
+      textDim:      "#2a3040",
+      textMuted:    "#464e68",
+      textHint:     "#6a7090",
+      textFaint:    "#6a7090",
+      sectionLabel: "#464e68",
+      btnTextDim:   "#6a7090",
+    };
+  }
+}
+
 const SHAPE_KEY = "mindes_shape";
 export function useNodeShape() {
   const [shape, setShape] = useState(() => {

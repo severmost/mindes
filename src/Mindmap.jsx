@@ -6,6 +6,7 @@ import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { ensureNotificationPermission } from "./notifications";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
+import { boostTheme } from "./theme";
 import {
   COLORS, PRIORITY_COLORS, genId,
   toLocalInput, fromLocalInput, formatDeadline,
@@ -679,11 +680,12 @@ function ChildColumn({ child, childIdx, onNavigate, onNavigateGc, onEdit, theme,
 /* ── Main ── */
 export default function Mindmap({
   maps, activeMapId, onSelectMap, onAddMap, onDeleteMap, onRenameMap,
-  onUpdateTree, user, onSignOut, theme, themeName, onToggleTheme,
+  onUpdateTree, user, onSignOut, theme: themeProp, themeName, onToggleTheme,
   nodeShape = "circle", onToggleShape = () => {}, onGoHome,
   taskId, onNavigateTask, onNavigateMap,
   bgUrl, onOpenBgPanel,
 }) {
+  const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [navPath, setNavPath]         = useState(["root"]);
   const [selectedId, setSelectedId]   = useState(null);
   const [overlayMode, setOverlayMode] = useState(null);
