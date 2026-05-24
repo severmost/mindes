@@ -884,7 +884,7 @@ export default function Mindmap({
       })()}
 
       {/* Breadcrumb */}
-      <div style={{ flexShrink: 0, height: 40, display: "flex", alignItems: "center", padding: "0 12px", gap: 2, background: theme.panelTabBg, borderBottom: `1px solid ${theme.surfaceBorderSoft}` }}>
+      <div style={{ flexShrink: 0, height: 40, display: "flex", alignItems: "center", padding: "0 12px", gap: 2, borderBottom: `1px solid ${theme.surfaceBorderSoft}` }}>
         {navPath.length > 1 && (
           <button onClick={navigateUp} style={{ background: "none", border: "none", color: theme.textDim, fontFamily: "'Inter'", fontSize: 18, cursor: "pointer", padding: "0 6px 0 0", lineHeight: 1, flexShrink: 0 }}>‹</button>
         )}
