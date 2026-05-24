@@ -5,6 +5,7 @@ import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
   collectByDeadline, collectArchived, collectByPriority,
+  updateNode, setAllDone,
 } from "./utils";
 
 const PRIORITY_OPTIONS = [
@@ -522,6 +523,10 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
 
   const winW = useWindowWidth();
 
+  const restoreTask = (mapId, taskId) => {
+    onUpdateTree(mapId, t => updateNode(t, taskId, n => ({ ...setAllDone(n, false), archived: false })));
+  };
+
   // Back button / swipe-back для модалок
   const prevEditingRef = useRef(null);
   const prevOverlayRef = useRef(null);
@@ -822,6 +827,10 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
                       <div style={{ fontSize: 14, fontWeight: 600, color: theme.textDim, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.text}</div>
                       <div style={{ fontSize: 11, color: theme.textFaint, marginTop: 2 }}>{t.mapName}</div>
                     </div>
+                    <button onClick={() => restoreTask(t.mapId, t.id)}
+                      style={{ background: "transparent", border: `1px solid ${co.bg}`, color: co.bg, borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontFamily: "'Inter'", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                      Восстановить
+                    </button>
                   </div>
                 );
               })}
