@@ -4,8 +4,8 @@
 
 import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { ensureNotificationPermission } from "./notifications";
-import BrandLogo from "./BrandLogo";
 import { useWindowWidth } from "./hooks";
+import { AppHeader, AppOverlay } from "./ui";
 import {
   COLORS, PRIORITY_COLORS, genId,
   toLocalInput, fromLocalInput, formatDeadline,
@@ -15,14 +15,6 @@ import {
   setAllDone, isAllDone, getNodeColor,
   collectArchived, collectByDeadline,
 } from "./utils";
-
-// ── Icons ──
-function SunIcon({ size = 16 }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>;
-}
-function MoonIcon({ size = 16 }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
-}
 
 // ── Color Picker ──
 function ColorPicker({ currentIdx, onChange, onClose, theme }) {
@@ -34,89 +26,6 @@ function ColorPicker({ currentIdx, onChange, onClose, theme }) {
           onMouseEnter={e => e.target.style.transform = "scale(1.15)"}
           onMouseLeave={e => { if (i !== currentIdx) e.target.style.transform = "scale(1)"; }} />
       ))}
-    </div>
-  );
-}
-
-// ── Map Header ──
-function MapHeader({ maps, activeId, user, onSignOut, theme, themeName, onToggleTheme, onOpenToday, onOpenArchive, onGoHome, onOpenBgPanel }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const activeMap = maps.find(m => m.id === activeId);
-  const mapIdx = maps.findIndex(m => m.id === activeId);
-  const resolvedColorIdx = (activeMap?.tree?.colorIdx !== undefined && activeMap?.tree?.colorIdx !== null)
-    ? activeMap.tree.colorIdx : (mapIdx >= 0 ? mapIdx : 0);
-  const tc = COLORS[resolvedColorIdx % COLORS.length];
-
-  return (
-    <div style={{ flexShrink: 0, height: 56, display: "flex", alignItems: "center", background: "transparent", padding: "0 16px", gap: 10, zIndex: 15 }}
-      onClick={() => menuOpen && setMenuOpen(false)}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-        {/* Логотип кликабелен — ведёт на главную */}
-        <BrandLogo size={28} fontSize={15} onClick={onGoHome} />
-        {activeMap?.name && (
-          <>
-            <span style={{ color: theme.surfaceBorder, fontSize: 16, flexShrink: 0 }}>›</span>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: tc.bg, flexShrink: 0 }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{activeMap.name}</span>
-          </>
-        )}
-      </div>
-      {user && (
-        <div style={{ position: "relative", flexShrink: 0 }}>
-          <button onClick={e => { e.stopPropagation(); setMenuOpen(o => !o); }}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 6,
-              display: "flex", flexDirection: "column", gap: 5.5 }}>
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(9.5px) rotate(45deg)" : "none" }} />
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "opacity .2s", opacity: menuOpen ? 0 : 1 }} />
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(-9.5px) rotate(-45deg)" : "none" }} />
-          </button>
-          {menuOpen && (
-            <div onClick={e => e.stopPropagation()} style={{
-              position: "absolute", top: 48, right: 0, zIndex: 40,
-              background: theme.panelBg, border: `1px solid ${theme.surfaceBorder}`,
-              borderRadius: 14, padding: "8px 0", minWidth: 190,
-              boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
-              animation: "menuIn .18s ease",
-            }}>
-              <div style={{ fontSize: 12, color: theme.textDim, padding: "4px 16px 8px", borderBottom: `1px solid ${theme.surfaceBorder}`, marginBottom: 4, wordBreak: "break-all" }}>{user.email}</div>
-              {[
-                { label: "Сегодня", action: () => { setMenuOpen(false); onOpenToday?.(); } },
-                { label: "Архив",   action: () => { setMenuOpen(false); onOpenArchive?.(); } },
-                { label: "Фон",     action: () => { setMenuOpen(false); onOpenBgPanel?.(); } },
-              ].map(({ label, action }) => (
-                <div key={label} className="menu-item" onClick={action}>{label}</div>
-              ))}
-              <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
-              <div className="menu-item" onClick={() => { setMenuOpen(false); onToggleTheme(); }}
-                style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ display: "inline-flex", color: theme.btnText }}>{themeName === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}</span>
-                {themeName === "dark" ? "Светлая тема" : "Тёмная тема"}
-              </div>
-              <div className="menu-item-danger" onClick={() => { setMenuOpen(false); onSignOut(); }}
-                style={{ color: "#FF8A8A" }}>Выйти</div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Overlay List (Сегодня / Архив) ──
-function OverlayList({ title, children, theme, onClose }) {
-  const touchStartY = useRef(0);
-  const onTouchStart = e => { touchStartY.current = e.touches[0].clientY; };
-  const onTouchEnd = e => { if (e.changedTouches[0].clientY - touchStartY.current > 80) onClose(); };
-  return (
-    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-      style={{ position: "fixed", inset: 0, paddingTop: "env(safe-area-inset-top)", background: theme.appBg, color: theme.text, zIndex: 30, display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", animation: "overlaySlideUp .2s ease" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: `1px solid ${theme.surfaceBorderSoft}`, flexShrink: 0 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>{title}</h2>
-        <button onClick={onClose} style={{ background: "none", border: "none", color: theme.textMuted, fontSize: 26, cursor: "pointer", lineHeight: 1, padding: "4px 10px" }}>×</button>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px", maxWidth: 700, width: "100%", margin: "0 auto", boxSizing: "border-box" }}>
-        {children}
-      </div>
     </div>
   );
 }
@@ -958,11 +867,22 @@ export default function Mindmap({
     }}>
 
       {/* Header */}
-      <MapHeader maps={maps} activeId={activeMapId} user={user} onSignOut={onSignOut}
-        theme={theme} themeName={themeName} onToggleTheme={onToggleTheme}
-        onOpenToday={() => setOverlayMode("today")}
-        onOpenArchive={() => setOverlayMode("archive")}
-        onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel} />
+      {(() => {
+        const activeMap = maps.find(m => m.id === activeMapId);
+        const mapIdx    = maps.findIndex(m => m.id === activeMapId);
+        const colorIdx  = (activeMap?.tree?.colorIdx != null) ? activeMap.tree.colorIdx : (mapIdx >= 0 ? mapIdx : 0);
+        return (
+          <AppHeader
+            theme={theme} themeName={themeName} onToggleTheme={onToggleTheme}
+            onSignOut={onSignOut} onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel}
+            onToday={() => setOverlayMode("today")}
+            onArchive={() => setOverlayMode("archive")}
+            user={user}
+            mapName={activeMap?.name}
+            mapColor={COLORS[colorIdx % COLORS.length].bg}
+          />
+        );
+      })()}
 
       {/* Breadcrumb */}
       <div style={{ flexShrink: 0, height: 40, display: "flex", alignItems: "center", padding: "0 12px", gap: 2, background: theme.panelTabBg, borderBottom: `1px solid ${theme.surfaceBorderSoft}` }}>
@@ -1104,11 +1024,11 @@ export default function Mindmap({
           </div>
         );
         return (
-          <OverlayList title="Сегодня" theme={theme} onClose={() => setOverlayMode(null)}>
+          <AppOverlay title="Сегодня" theme={theme} onClose={() => setOverlayMode(null)}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
               : <><Section title="Просрочено" list={overdue} /><Section title="Сегодня" list={today} /><Section title="На неделе" list={week} /></>}
-          </OverlayList>
+          </AppOverlay>
         );
       })()}
 
@@ -1116,7 +1036,7 @@ export default function Mindmap({
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <OverlayList title="Архив" theme={theme} onClose={() => setOverlayMode(null)}>
+          <AppOverlay title="Архив" theme={theme} onClose={() => setOverlayMode(null)}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
               : items.map(t => {
@@ -1136,7 +1056,7 @@ export default function Mindmap({
                   </div>
                 );
               })}
-          </OverlayList>
+          </AppOverlay>
         );
       })()}
     </div>

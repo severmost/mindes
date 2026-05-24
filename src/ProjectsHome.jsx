@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import BrandLogo from "./BrandLogo";
 import { useWindowWidth } from "./hooks";
+import { AppHeader, AppOverlay } from "./ui";
 import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
@@ -465,60 +465,11 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
   );
 }
 
-// ── Menu dropdown ──
-function MenuDropdown({ theme, themeName, onToggleTheme, onSignOut, onToday, onArchive, onClose, onOpenBgPanel }) {
-  return (
-    <div style={{
-      position: "absolute", top: 52, right: 16, zIndex: 50,
-      background: theme.panelBg,
-      border: `1px solid ${theme.surfaceBorder}`,
-      borderRadius: 14,
-      boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
-      padding: "8px 0",
-      minWidth: 180,
-      animation: "menuIn .18s ease",
-    }} onClick={e => e.stopPropagation()}>
-      <div className="menu-item" onClick={() => { onToday?.(); onClose(); }}>Сегодня</div>
-      <div className="menu-item" onClick={() => { onArchive?.(); onClose(); }}>Архив</div>
-      <div className="menu-item" onClick={() => { onOpenBgPanel?.(); onClose(); }}>Фон</div>
-      <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
-      <div className="menu-item" onClick={() => { onToggleTheme(); onClose(); }}
-        style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {themeName === "dark" ? "Светлая тема" : "Тёмная тема"}
-      </div>
-      <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
-      <div className="menu-item-danger" onClick={() => { onSignOut(); onClose(); }}
-        style={{ color: "#F44336" }}>
-        Выйти
-      </div>
-    </div>
-  );
-}
-
-// ── Overlay (Сегодня / Архив) для главной ──
-function HomeOverlay({ title, children, theme, onClose }) {
-  const touchStartY = useRef(0);
-  const onTouchStart = e => { touchStartY.current = e.touches[0].clientY; };
-  const onTouchEnd = e => { if (e.changedTouches[0].clientY - touchStartY.current > 80) onClose(); };
-  return (
-    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-      style={{ position: "fixed", inset: 0, paddingTop: "env(safe-area-inset-top)", background: theme.appBg, zIndex: 100, display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", color: theme.text, animation: "overlaySlideUp .2s ease" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: `1px solid ${theme.surfaceBorderSoft}`, flexShrink: 0 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>{title}</h2>
-        <button onClick={onClose} style={{ background: "none", border: "none", color: theme.textMuted, fontSize: 26, cursor: "pointer", lineHeight: 1, padding: "4px 10px" }}>×</button>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px", maxWidth: 700, width: "100%", margin: "0 auto", boxSizing: "border-box" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
 
 
 // ── Main component ──
 export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel }) {
   const [editing, setEditing] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [overlayMode, setOverlayMode] = useState(initialOverlay || null);
 
   const winW = useWindowWidth();
@@ -593,38 +544,16 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
         color: theme.text, position: "relative", animation: "pageIn .2s ease",
         zIndex: 1,
       }}
-      onClick={() => menuOpen && setMenuOpen(false)}
     >
       {/* Header */}
-      <div style={{
-        height: 56, paddingTop: "env(safe-area-inset-top)",
-        paddingLeft: 16, paddingRight: 16,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        position: "sticky", top: 0, zIndex: 10,
-        background: theme.name === "dark" ? "rgba(12,12,24,0)" : "rgba(238,242,255,0)",
-        backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
-        boxSizing: "content-box",
-      }} onClick={() => menuOpen && setMenuOpen(false)}>
-        <BrandLogo size={32} fontSize={17} onClick={onGoHome} />
-        <div style={{ position: "relative" }}>
-          <button
-            onClick={e => { e.stopPropagation(); setMenuOpen(v => !v); }}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 6,
-              display: "flex", flexDirection: "column", gap: 5.5, position: "relative", zIndex: 1 }}
-          >
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(9.5px) rotate(45deg)" : "none" }} />
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "opacity .2s", opacity: menuOpen ? 0 : 1 }} />
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(-9.5px) rotate(-45deg)" : "none" }} />
-          </button>
-          {menuOpen && (
-            <MenuDropdown theme={theme} themeName={themeName} onToggleTheme={onToggleTheme} onSignOut={onSignOut}
-              onToday={() => { setOverlayMode("today"); setMenuOpen(false); }}
-              onArchive={() => { setOverlayMode("archive"); setMenuOpen(false); }}
-              onOpenBgPanel={() => { onOpenBgPanel?.(); setMenuOpen(false); }}
-              onClose={() => setMenuOpen(false)} />
-          )}
-        </div>
-      </div>
+      <AppHeader
+        sticky
+        theme={theme} themeName={themeName} onToggleTheme={onToggleTheme}
+        onSignOut={onSignOut} onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel}
+        onToday={() => setOverlayMode("today")}
+        onArchive={() => setOverlayMode("archive")}
+        user={user}
+      />
 
       {/* Content */}
       <div style={{
@@ -749,11 +678,11 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
           </div>
         );
         return (
-          <HomeOverlay title="Сегодня" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Сегодня" theme={theme} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
               : <><Section title="Просрочено" list={overdue2} /><Section title="Сегодня" list={today2} /><Section title="На неделе" list={week2} /></>}
-          </HomeOverlay>
+          </AppOverlay>
         );
       })()}
 
@@ -767,7 +696,7 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
         ];
         const total = byPriority.high.length + byPriority.medium.length + byPriority.low.length;
         return (
-          <HomeOverlay title="Приоритеты" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Приоритеты" theme={theme} onClose={closeOverlay}>
             {total === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач с приоритетом</div>
               : sections.map(({ key, label, color }) => {
@@ -806,7 +735,7 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
                   </div>
                 );
               })}
-          </HomeOverlay>
+          </AppOverlay>
         );
       })()}
 
@@ -814,7 +743,7 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <HomeOverlay title="Архив" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Архив" theme={theme} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
               : items.map(t => {
@@ -834,7 +763,7 @@ export default function ProjectsHome({ maps, theme, themeName, onToggleTheme, on
                   </div>
                 );
               })}
-          </HomeOverlay>
+          </AppOverlay>
         );
       })()}
     </div>
