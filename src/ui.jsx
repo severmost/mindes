@@ -136,8 +136,7 @@ export function AppHeader({ theme, themeName, onToggleTheme, onSignOut, onGoHome
           paddingTop: "env(safe-area-inset-top)",
           position: "sticky", top: 0, zIndex: 10,
           justifyContent: "space-between",
-          background: theme.name === "dark" ? "rgba(12,12,24,0)" : "rgba(238,242,255,0)",
-          backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
+          background: "transparent",
           boxSizing: "content-box",
         } : {
           flexShrink: 0,
