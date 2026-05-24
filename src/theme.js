@@ -1,0 +1,142 @@
+// Палитры тёмной и светлой темы + хук с persistence в localStorage.
+// Хук читает сохранённое значение, иначе подхватывает системную prefers-color-scheme.
+
+import { useEffect, useState } from "react";
+
+export const themes = {
+  dark: {
+    name: "dark",
+    appBg: "linear-gradient(135deg,#0c0c18,#151528,#12203a)",
+    panelBg: "#111119",
+    panelBorder: "#1e1e2e",
+    panelTabBg: "linear-gradient(180deg, #0a0a14 0%, transparent 100%)",
+    surfaceBg: "#1a1a28",
+    surfaceBgHover: "#1e1e3a",
+    surfaceBorder: "#2a2a3a",
+    surfaceBorderSoft: "#1e1e2e",
+    inputBg: "#1a1a28",
+    inputBorder: "#2a2a3a",
+    btnBg: "#151528",
+    btnText: "#aaa",
+    btnTextDim: "#666",
+    tabActiveBg: "#1a1a2e",
+    tabActiveText: "#eee",
+    tabInactiveText: "#666",
+    tabStatsActive: "#888",
+    tabStatsInactive: "#444",
+    text: "#ddd",
+    textDim: "#888",
+    textMuted: "#555",
+    textHint: "#333",
+    textFaint: "#444",
+    nodeFill: "#1a1b2e",
+    nodeDoneFill: "#1e1e2e",
+    nodeDoneStroke: "#444",
+    nodeDoneText: "#666",
+    gridDot: "#ffffff08",
+    lineDone: "#333",
+    avatarBg: "#151528",
+    sectionLabel: "#555",
+    progressTrack: "#1e1e2e",
+    deleteBg: "#FF525210",
+    deleteBorder: "#FF525230",
+    loginCardBg: "rgba(20,20,40,0.6)",
+    loginCardBorder: "#2a2a3a",
+    loginPrimaryBtnBg: "#fff",
+    loginPrimaryBtnText: "#1a1a28",
+  },
+  light: {
+    name: "light",
+    appBg: "linear-gradient(145deg, #eef2ff 0%, #ebe5ff 55%, #f3e8ff 100%)",
+    panelBg: "#f4f7ff",
+    panelBorder: "#dde2f0",
+    panelTabBg: "linear-gradient(180deg, #e8edff 0%, transparent 100%)",
+    surfaceBg: "#ffffff",
+    surfaceBgHover: "#edf1ff",
+    surfaceBorder: "#dde2ec",
+    surfaceBorderSoft: "#eaedfa",
+    inputBg: "#f5f7fb",
+    inputBorder: "#d8dde7",
+    btnBg: "#ffffff",
+    btnText: "#5a6076",
+    btnTextDim: "#a6acc0",
+    tabActiveBg: "#ffffff",
+    tabActiveText: "#1a1a28",
+    tabInactiveText: "#7d8499",
+    tabStatsActive: "#5a6076",
+    tabStatsInactive: "#a6acc0",
+    text: "#1a1a28",
+    textDim: "#5a6076",
+    textMuted: "#7d8499",
+    textHint: "#a6acc0",
+    textFaint: "#a6acc0",
+    nodeFill: "#ffffff",
+    nodeDoneFill: "#edf1ff",
+    nodeDoneStroke: "#c0c5d3",
+    nodeDoneText: "#7d8499",
+    gridDot: "#0a0a1a10",
+    lineDone: "#c0c5d3",
+    avatarBg: "#eaedff",
+    sectionLabel: "#7d8499",
+    progressTrack: "#e5e9f8",
+    deleteBg: "#FF525210",
+    deleteBorder: "#FF525230",
+    loginCardBg: "rgba(244,247,255,0.92)",
+    loginCardBorder: "#d8ddf2",
+    loginPrimaryBtnBg: "#1a1a28",
+    loginPrimaryBtnText: "#ffffff",
+  },
+};
+
+const STORAGE_KEY = "mindes_theme";
+
+function getInitialThemeName() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "light" || stored === "dark") return stored;
+    if (typeof window !== "undefined" && window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: light)").matches) {
+      return "light";
+    }
+  } catch {}
+  return "dark";
+}
+
+export function useTheme() {
+  const [name, setName] = useState(getInitialThemeName);
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, name); } catch {}
+    // Подкрашиваем html/body, чтобы при перезагрузке/первом рендере не мелькал чужой фон.
+    const t = themes[name];
+    if (typeof document !== "undefined") {
+      document.documentElement.style.background = t.panelBg;
+      document.body.style.background = t.panelBg;
+    }
+  }, [name]);
+
+  return {
+    theme: themes[name],
+    name,
+    toggle: () => setName((n) => (n === "dark" ? "light" : "dark")),
+    setTheme: setName,
+  };
+}
+
+const SHAPE_KEY = "mindes_shape";
+export function useNodeShape() {
+  const [shape, setShape] = useState(() => {
+    try {
+      const v = localStorage.getItem(SHAPE_KEY);
+      return v === "rect" ? "rect" : "circle";
+    } catch { return "circle"; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(SHAPE_KEY, shape); } catch {}
+  }, [shape]);
+  return {
+    shape,
+    toggle: () => setShape((s) => (s === "circle" ? "rect" : "circle")),
+    setShape,
+  };
+}

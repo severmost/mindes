@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mindes</string>
+    <string name="title_activity_main">Mindes</string>
+    <string name="package_name">app.mindes</string>
+    <string name="custom_url_scheme">app.mindes</string>
+    <string name="server_client_id">600007847875-18si6ulki7smrirfhbccssq7mss9osf9.apps.googleusercontent.com</string>
+</resources>

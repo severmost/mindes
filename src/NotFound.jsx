@@ -1,0 +1,46 @@
+export default function NotFound({ theme, onGoHome }) {
+  return (
+    <div style={{
+      width: "100%", height: "100vh",
+      background: theme.appBg,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      fontFamily: "'Inter', sans-serif",
+      color: theme.text,
+      gap: 12,
+      padding: 24,
+      boxSizing: "border-box",
+      animation: "pageIn .2s ease",
+    }}>
+      <div style={{ fontSize: 72, fontWeight: 900, color: theme.surfaceBorder, lineHeight: 1 }}>
+        404
+      </div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, marginTop: 4 }}>
+        Страница не найдена
+      </div>
+      <div style={{ fontSize: 14, color: theme.textMuted, textAlign: "center", maxWidth: 280 }}>
+        Возможно, ссылка устарела или такой страницы никогда не существовало
+      </div>
+      <button
+        onClick={onGoHome}
+        style={{
+          marginTop: 16,
+          padding: "12px 28px",
+          borderRadius: 14,
+          border: "none",
+          background: "#5b3fc4",
+          color: "#fff",
+          fontSize: 15,
+          fontWeight: 700,
+          cursor: "pointer",
+          fontFamily: "'Inter', sans-serif",
+          transition: "opacity .15s",
+        }}
+        onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
+        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+      >
+        На главную
+      </button>
+    </div>
+  );
+}

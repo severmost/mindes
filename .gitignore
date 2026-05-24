@@ -1,0 +1,32 @@
+node_modules
+dist
+.env.local
+.env
+*.log
+.DS_Store
+
+# Capacitor / Android
+android/app/build
+android/build
+android/.gradle
+android/local.properties
+android/app/release
+android/app/google-services.json
+ios/
+
+# Firebase
+.firebase
+firebase-debug.log
+
+# Editor
+.vscode
+.idea
+
+# Claude Code
+.claude/
+
+# Backup / temp files
+*.bak
+*.orig
+mindes.jsx
+mindes.original.jsx.bak

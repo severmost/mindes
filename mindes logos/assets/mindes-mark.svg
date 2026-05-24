@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Mindes mark">
+
+  <g fill="#5b3fc4">
+    <rect x="29" y="40" width="22" height="120" rx="11"></rect>
+    <rect x="67" y="84" width="22" height="76" rx="11"></rect>
+    <rect x="105" y="84" width="22" height="76" rx="11"></rect>
+    <rect x="143" y="40" width="22" height="120" rx="11"></rect>
+    <circle cx="100" cy="50" r="11"></circle>
+  </g>
+  <g stroke="#5b3fc4" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.55">
+    <line x1="100" y1="50" x2="78" y2="84"></line>
+    <line x1="100" y1="50" x2="116" y2="84"></line>
+  </g>
+
+</svg>

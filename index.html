@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#5b3fc4" />
+    <title>Mindes</title>
+
+    <!-- Фавиконы -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Mindes" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script>
+      try {
+        var t = localStorage.getItem("mindes_theme") ||
+          (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        var bg = t === "light" ? "#eef2ff" : "#0c0c18";
+        document.documentElement.style.background = bg;
+        document.documentElement.style.colorScheme = t;
+      } catch(e) {}
+    </script>
+    <style>
+      html, body, #root { margin: 0; padding: 0; width: 100%; height: 100%; background: #0c0c18; }
+      @media (prefers-color-scheme: light) { html, body, #root { background: #eef2ff; } }
+      body { font-family: "Inter", system-ui, sans-serif; color: #ddd; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+      * { box-sizing: border-box; }
+
+      @keyframes pageIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes menuIn {
+        from { opacity: 0; transform: scale(0.94) translateY(-8px); }
+        to   { opacity: 1; transform: scale(1)    translateY(0); }
+      }
+      @keyframes cardIn {
+        from { opacity: 0; transform: translateY(12px) scale(0.95); }
+        to   { opacity: 1; transform: translateY(0)    scale(1); }
+      }
+      @keyframes overlaySlideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
