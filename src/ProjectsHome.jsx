@@ -477,47 +477,17 @@ function MenuDropdown({ theme, themeName, onToggleTheme, onSignOut, onToday, onA
       minWidth: 180,
       animation: "menuIn .18s ease",
     }} onClick={e => e.stopPropagation()}>
-      <div
-        onClick={() => { onToday?.(); onClose(); }}
-        style={{ padding: "11px 16px", fontSize: 14, color: theme.text, cursor: "pointer" }}
-        onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        Сегодня
-      </div>
-      <div
-        onClick={() => { onArchive?.(); onClose(); }}
-        style={{ padding: "11px 16px", fontSize: 14, color: theme.text, cursor: "pointer" }}
-        onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        Архив
-      </div>
-      <div
-        onClick={() => { onOpenBgPanel?.(); onClose(); }}
-        style={{ padding: "11px 16px", fontSize: 14, color: theme.text, cursor: "pointer" }}
-        onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        Фон
-      </div>
+      <div className="menu-item" onClick={() => { onToday?.(); onClose(); }}>Сегодня</div>
+      <div className="menu-item" onClick={() => { onArchive?.(); onClose(); }}>Архив</div>
+      <div className="menu-item" onClick={() => { onOpenBgPanel?.(); onClose(); }}>Фон</div>
       <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
-      <div
-        onClick={() => { onToggleTheme(); onClose(); }}
-        style={{ padding: "11px 16px", fontSize: 14, color: theme.text, cursor: "pointer",
-          display: "flex", alignItems: "center", gap: 10 }}
-        onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
+      <div className="menu-item" onClick={() => { onToggleTheme(); onClose(); }}
+        style={{ display: "flex", alignItems: "center", gap: 10 }}>
         {themeName === "dark" ? "Светлая тема" : "Тёмная тема"}
       </div>
       <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
-      <div
-        onClick={() => { onSignOut(); onClose(); }}
-        style={{ padding: "11px 16px", fontSize: 14, color: "#F44336", cursor: "pointer" }}
-        onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
+      <div className="menu-item-danger" onClick={() => { onSignOut(); onClose(); }}
+        style={{ color: "#F44336" }}>
         Выйти
       </div>
     </div>

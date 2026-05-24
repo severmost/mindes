@@ -1,0 +1,106 @@
+/* ──────────────────────────────────────────────────────────────
+   Global animations (supplement to index.html)
+────────────────────────────────────────────────────────────── */
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Dropdown menu items
+   (uses CSS vars set by theme.js on :root)
+────────────────────────────────────────────────────────────── */
+.menu-item {
+  padding: 11px 16px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .12s;
+}
+.menu-item:hover {
+  background: var(--surface-bg-hover);
+}
+
+.menu-item-danger {
+  padding: 11px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.menu-item-danger:hover {
+  background: var(--delete-bg);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   SidePanel internals:
+     .pi  — text input / textarea
+     .ci  — checklist row
+     .cb  — checkbox circle
+     .xb  — delete (×) button inside .ci
+   --branch-color must be set as an inline CSS var on the panel root.
+────────────────────────────────────────────────────────────── */
+.pi {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border .2s;
+}
+.pi:focus {
+  border-color: var(--branch-color, #7c3aed);
+}
+
+.ci {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: background .15s;
+}
+.ci:hover {
+  background: var(--surface-bg);
+}
+
+.cb {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 2px solid var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all .2s;
+  cursor: pointer;
+}
+.cb.dn {
+  background: var(--branch-color, #7c3aed);
+  border-color: var(--branch-color, #7c3aed);
+}
+
+.xb {
+  opacity: 0;
+  transition: opacity .15s;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.ci:hover .xb {
+  opacity: 1;
+}
+.xb:hover {
+  color: #FF5252;
+}

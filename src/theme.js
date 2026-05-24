@@ -102,17 +102,42 @@ function getInitialThemeName() {
   return "dark";
 }
 
+/** Записывает все цвета темы как CSS-переменные на :root. */
+function applyThemeCssVars(t) {
+  const el = document.documentElement;
+  el.style.background = t.panelBg;
+  document.body.style.background = t.panelBg;
+  const vars = {
+    "--app-bg":              t.appBg,
+    "--panel-bg":            t.panelBg,
+    "--panel-tab-bg":        t.panelTabBg,
+    "--surface-bg":          t.surfaceBg,
+    "--surface-bg-hover":    t.surfaceBgHover,
+    "--surface-border":      t.surfaceBorder,
+    "--surface-border-soft": t.surfaceBorderSoft,
+    "--input-bg":            t.inputBg,
+    "--input-border":        t.inputBorder,
+    "--btn-bg":              t.btnBg,
+    "--btn-text":            t.btnText,
+    "--text":                t.text,
+    "--text-dim":            t.textDim,
+    "--text-muted":          t.textMuted,
+    "--text-hint":           t.textHint,
+    "--text-faint":          t.textFaint,
+    "--section-label":       t.sectionLabel,
+    "--progress-track":      t.progressTrack,
+    "--delete-bg":           t.deleteBg,
+    "--delete-border":       t.deleteBorder,
+  };
+  Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
+}
+
 export function useTheme() {
   const [name, setName] = useState(getInitialThemeName);
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, name); } catch {}
-    // Подкрашиваем html/body, чтобы при перезагрузке/первом рендере не мелькал чужой фон.
-    const t = themes[name];
-    if (typeof document !== "undefined") {
-      document.documentElement.style.background = t.panelBg;
-      document.body.style.background = t.panelBg;
-    }
+    applyThemeCssVars(themes[name]);
   }, [name]);
 
   return {

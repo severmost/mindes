@@ -84,23 +84,16 @@ function MapHeader({ maps, activeId, user, onSignOut, theme, themeName, onToggle
                 { label: "Архив",   action: () => { setMenuOpen(false); onOpenArchive?.(); } },
                 { label: "Фон",     action: () => { setMenuOpen(false); onOpenBgPanel?.(); } },
               ].map(({ label, action }) => (
-                <div key={label} onClick={action}
-                  style={{ padding: "11px 16px", fontSize: 14, color: theme.text, cursor: "pointer" }}
-                  onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>{label}</div>
+                <div key={label} className="menu-item" onClick={action}>{label}</div>
               ))}
               <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
-              <div onClick={() => { setMenuOpen(false); onToggleTheme(); }}
-                style={{ padding: "11px 16px", fontSize: 14, color: theme.text, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
-                onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+              <div className="menu-item" onClick={() => { setMenuOpen(false); onToggleTheme(); }}
+                style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ display: "inline-flex", color: theme.btnText }}>{themeName === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}</span>
                 {themeName === "dark" ? "Светлая тема" : "Тёмная тема"}
               </div>
-              <div onClick={() => { setMenuOpen(false); onSignOut(); }}
-                style={{ padding: "11px 16px", fontSize: 14, color: "#FF8A8A", cursor: "pointer" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#FF525210"}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Выйти</div>
+              <div className="menu-item-danger" onClick={() => { setMenuOpen(false); onSignOut(); }}
+                style={{ color: "#FF8A8A" }}>Выйти</div>
             </div>
           )}
         </div>
@@ -345,6 +338,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, isMobile }) 
     display: "flex", flexDirection: "column",
     fontFamily: "'Inter', sans-serif", color: theme.text,
     overflow: "hidden",
+    "--branch-color": branchColor.bg,
     ...(isMobile ? {
       bottom: 0, left: 0, right: 0,
       borderRadius: "20px 20px 0 0",
@@ -370,20 +364,6 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, isMobile }) 
           <div style={{ width: 44, height: 4, borderRadius: 2, background: theme.surfaceBorder }} />
         </div>
       )}
-      <style>{`
-        @keyframes panelIn { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
-        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-        .pi { background:${theme.inputBg};border:1px solid ${theme.inputBorder};border-radius:8px;padding:10px 12px;color:${theme.text};font-family:'Inter',sans-serif;font-size:14px;outline:none;width:100%;box-sizing:border-box;transition:border .2s }
-        .pi:focus { border-color:${branchColor.bg} }
-        .ci { display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;transition:background .15s }
-        .ci:hover { background:${theme.surfaceBg} }
-        .cb { width:20px;height:20px;border-radius:5px;border:2px solid ${theme.textFaint};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;cursor:pointer }
-        .cb.dn { background:${branchColor.bg};border-color:${branchColor.bg} }
-        .xb { opacity:0;transition:opacity .15s;cursor:pointer;color:${theme.textMuted};font-size:16px;margin-left:auto;flex-shrink:0 }
-        .ci:hover .xb { opacity:1 }
-        .xb:hover { color:#FF5252 }
-      `}</style>
-
       <div style={{ padding: "16px 20px 12px", display: "flex", alignItems: "flex-start", gap: 8, flexShrink: 0 }}>
         <textarea className="pi" value={title}
           onChange={e => {
