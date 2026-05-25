@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Политика конфиденциальности — Mindes</title>
+  <style>
+    :root {
+      --bg:   #0e0e1c;
+      --card: #161625;
+      --text: #ddd;
+      --dim:  #888;
+      --acc:  #7c5fe6;
+      --border: #2a2a3a;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg:   #f0f2ff;
+        --card: #ffffff;
+        --text: #1a1a28;
+        --dim:  #5a6076;
+        --acc:  #5b3fc4;
+        --border: #dde2ec;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Inter", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 32px 16px 64px;
+    }
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+    .logo-mark {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--acc);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: #fff;
+      font-family: "Geist", "Inter", sans-serif;
+      letter-spacing: -1px;
+    }
+    .logo-name {
+      font-size: 18px; font-weight: 700; color: var(--text);
+    }
+    h1 {
+      font-size: 26px; font-weight: 800; margin-bottom: 6px;
+    }
+    .updated {
+      font-size: 13px; color: var(--dim); margin-bottom: 36px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 16px; font-weight: 700;
+      color: var(--acc);
+      margin-bottom: 12px;
+    }
+    p { color: var(--text); margin-bottom: 10px; }
+    p:last-child { margin-bottom: 0; }
+    ul {
+      padding-left: 20px;
+      color: var(--text);
+    }
+    li { margin-bottom: 6px; }
+    a { color: var(--acc); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 40px;
+      font-size: 13px;
+      color: var(--dim);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo">
+    <div class="logo-mark">M</div>
+    <div class="logo-name">Mindes</div>
+  </div>
+
+  <h1>Политика конфиденциальности</h1>
+  <div class="updated">Последнее обновление: 26 мая 2025 г.</div>
+
+  <div class="card">
+    <h2>Что такое Mindes</h2>
+    <p>Mindes — приложение для управления задачами и проектами. Мы уважаем вашу
+    приватность и собираем только те данные, которые необходимы для работы сервиса.</p>
+  </div>
+
+  <div class="card">
+    <h2>Какие данные мы собираем</h2>
+    <ul>
+      <li><strong>Аккаунт Google</strong> — имя и адрес электронной почты, которые вы
+      предоставляете при входе через Google Sign-In. Используются только для
+      идентификации вашей учётной записи.</li>
+      <li><strong>Содержимое задач</strong> — названия проектов, задачи, описания,
+      сроки и прочие данные, которые вы вводите в приложение. Хранятся в вашем
+      персональном разделе базы данных Firebase Firestore.</li>
+      <li><strong>Фоновые изображения</strong> — фотографии, которые вы загружаете
+      в качестве фона, хранятся в Firebase Storage.</li>
+      <li><strong>Локальные настройки</strong> — тема оформления и состояние
+      обучения сохраняются только на вашем устройстве (localStorage).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Как мы используем данные</h2>
+    <ul>
+      <li>Для отображения ваших проектов и задач на всех устройствах.</li>
+      <li>Для синхронизации данных между устройствами в реальном времени.</li>
+      <li>Для отправки локальных уведомлений-напоминаний о задачах
+      (только если вы это разрешили).</li>
+    </ul>
+    <p>Мы <strong>не продаём</strong> ваши данные третьим лицам, не используем их
+    для рекламы и не передаём без вашего явного согласия.</p>
+  </div>
+
+  <div class="card">
+    <h2>Сторонние сервисы</h2>
+    <p>Приложение использует инфраструктуру Google:</p>
+    <ul>
+      <li><a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Authentication</a> — вход через Google.</li>
+      <li><a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Firestore</a> — облачное хранение задач.</li>
+      <li><a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Storage</a> — хранение фоновых изображений.</li>
+    </ul>
+    <p>На эти сервисы распространяется
+    <a href="https://policies.google.com/privacy" target="_blank">Политика конфиденциальности Google</a>.</p>
+  </div>
+
+  <div class="card">
+    <h2>Хранение и безопасность</h2>
+    <p>Данные хранятся на серверах Google (Firebase) с разграничением доступа:
+    каждый пользователь может читать и изменять только свои данные.
+    Передача данных защищена протоколом HTTPS.</p>
+  </div>
+
+  <div class="card">
+    <h2>Ваши права</h2>
+    <ul>
+      <li><strong>Удаление данных</strong> — вы можете удалить все свои проекты
+      внутри приложения. Для полного удаления аккаунта напишите нам.</li>
+      <li><strong>Экспорт</strong> — данные хранятся в вашем аккаунте Firebase
+      и доступны для экспорта по запросу.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Дети</h2>
+    <p>Приложение не предназначено для детей младше 13 лет. Мы осознанно
+    не собираем данные несовершеннолетних.</p>
+  </div>
+
+  <div class="card">
+    <h2>Изменения политики</h2>
+    <p>При существенных изменениях мы обновим дату вверху страницы.
+    Продолжение использования приложения после изменений означает согласие
+    с обновлённой политикой.</p>
+  </div>
+
+  <div class="card">
+    <h2>Контакт</h2>
+    <p>По вопросам конфиденциальности пишите: <a href="mailto:support@mindes.app">support@mindes.app</a></p>
+  </div>
+
+  <div class="footer">
+    © 2025 Mindes. Все права защищены.
+  </div>
+
+</div>
+</body>
+</html>

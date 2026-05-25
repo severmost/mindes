@@ -7,6 +7,8 @@
   "background_color": "#5b3fc4",
   "theme_color": "#5b3fc4",
   "orientation": "any",
+  "related_applications": [],
+  "prefer_related_applications": false,
   "icons": [
     { "src": "favicon-48.png",        "sizes": "48x48",   "type": "image/png" },
     { "src": "apple-touch-icon.png",  "sizes": "180x180", "type": "image/png" },

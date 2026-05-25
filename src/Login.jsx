@@ -381,6 +381,14 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
             <p style={{ fontSize: 12, color: T.ink3, textAlign: "center", margin: "16px 0 0", lineHeight: 1.45 }}>
               Ваши задачи сохраняются в вашем Google-аккаунте<br/>и синхронизируются между устройствами.
             </p>
+
+            {/* Privacy policy link */}
+            <p style={{ fontSize: 11, color: T.ink3, textAlign: "center", margin: "10px 0 0" }}>
+              <a href="/privacy.html" target="_blank" rel="noopener noreferrer"
+                style={{ color: T.ink3, textDecoration: "underline", textUnderlineOffset: 2 }}>
+                Политика конфиденциальности
+              </a>
+            </p>
           </div>
         </div>
       </div>
