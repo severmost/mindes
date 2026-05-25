@@ -269,7 +269,6 @@ export function useFirestoreSync(user) {
 
   async function deleteMap(mapId) {
     if (!user) return;
-    if (maps.length <= 1) return;
     setMaps((prev) => prev.filter((m) => m.id !== mapId));
     pendingRef.current.delete(mapId);
     await deleteDoc(doc(db, "users", user.uid, "maps", mapId));
