@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
 import { boostTheme } from "./theme";
-import { EmptyHomeHint, OnboardingBanner } from "./Onboarding";
+import { EmptyHomeHint, OnboardingBanner, obWrongStep } from "./Onboarding";
 import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
@@ -604,8 +604,13 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 theme={theme}
                 isDesktop={isDesktop}
                 isFirst={idx === 0}
-                onOpen={() => { onOpenMap(map.id); onboarding?.completeStep("open-project"); }}
+                onOpen={() => {
+                  if (obWrongStep(onboarding, "open-project")) return;
+                  onOpenMap(map.id);
+                  onboarding?.completeStep("open-project");
+                }}
                 onEdit={() => {
+                  if (obWrongStep(onboarding, "edit-project")) return;
                   onboarding?.completeStep("edit-project");
                   setEditing({
                     id: map.id,

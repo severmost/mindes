@@ -107,6 +107,12 @@ export function useOnboarding() {
   return { isActive, currentStep, state, completeStep, skip, restart };
 }
 
+// Возвращает true если онбординг активен и данное действие — НЕ текущий шаг.
+// Используется как guard: if (obWrongStep(onboarding, "open-project")) return;
+export function obWrongStep(onboarding, stepId) {
+  return !!(onboarding?.isActive && onboarding.currentStep?.id !== stepId);
+}
+
 // ─── Затемнение вокруг цели (spotlight) ──────────────────────────────────────
 // Четыре прямоугольника вокруг target-элемента блокируют весь остальной UI.
 // Сам target остаётся открытым и кликабельным.

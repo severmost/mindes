@@ -7,7 +7,7 @@ import { ensureNotificationPermission } from "./notifications";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
 import { boostTheme } from "./theme";
-import { OnboardingBanner } from "./Onboarding";
+import { OnboardingBanner, obWrongStep } from "./Onboarding";
 import {
   COLORS, PRIORITY_COLORS, genId,
   toLocalInput, fromLocalInput, formatDeadline,
@@ -963,7 +963,11 @@ export default function Mindmap({
           <div data-ob="center-node">
             <NodeCard node={navNode} colorIdx={centerColorIdx} level={0}
               onNavigate={undefined}
-              onEdit={() => { setSelectedId(navNodeId); onboarding?.completeStep("select-node"); }}
+              onEdit={() => {
+              if (obWrongStep(onboarding, "select-node")) return;
+              setSelectedId(navNodeId);
+              onboarding?.completeStep("select-node");
+            }}
               theme={theme}
               singleTapEdit />
           </div>
@@ -984,9 +988,21 @@ export default function Mindmap({
                 <div key={child.id} data-ob={i === 0 ? "child-node" : undefined}>
                   <ChildColumn
                     child={child} childIdx={i}
-                    onNavigate={id => { navigateInto(id); onboarding?.completeStep("navigate-into"); }}
-                    onNavigateGc={(pid, gcId) => { navigateIntoGc(pid, gcId); onboarding?.completeStep("navigate-into"); }}
-                    onEdit={id => { setSelectedId(id); onboarding?.completeStep("edit-node"); }}
+                    onNavigate={id => {
+                      if (obWrongStep(onboarding, "navigate-into")) return;
+                      navigateInto(id);
+                      onboarding?.completeStep("navigate-into");
+                    }}
+                    onNavigateGc={(pid, gcId) => {
+                      if (obWrongStep(onboarding, "navigate-into")) return;
+                      navigateIntoGc(pid, gcId);
+                      onboarding?.completeStep("navigate-into");
+                    }}
+                    onEdit={id => {
+                      if (obWrongStep(onboarding, "edit-node")) return;
+                      setSelectedId(id);
+                      onboarding?.completeStep("edit-node");
+                    }}
                     theme={theme}
                     newTaskIds={newTaskIds}
                     onArchive={handleArchive}
