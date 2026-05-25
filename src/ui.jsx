@@ -65,7 +65,7 @@ export function AppOverlay({ title, children, theme, onClose, zIndex = 50 }) {
 // Dropdown menu rendered inside a position:relative container.
 // Pass user to show the email header at the top.
 export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
-  onToday, onArchive, onOpenBgPanel, onClose, user }) {
+  onToday, onArchive, onOpenBgPanel, onOnboarding, onClose, user }) {
   return (
     <div
       style={{
@@ -91,6 +91,7 @@ export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
       <div className="menu-item" onClick={() => { onToday?.();       onClose(); }}>Сегодня</div>
       <div className="menu-item" onClick={() => { onArchive?.();     onClose(); }}>Архив</div>
       <div className="menu-item" onClick={() => { onOpenBgPanel?.(); onClose(); }}>Фон</div>
+      <div className="menu-item" onClick={() => { onOnboarding?.();  onClose(); }}>Обучение</div>
       <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
       <div className="menu-item"
         onClick={() => { onToggleTheme(); onClose(); }}
@@ -119,7 +120,7 @@ export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
 //   mapColor  — accent color for the breadcrumb dot
 //   user      — enables the burger menu; user.email shows in dropdown header
 export function AppHeader({ theme, themeName, onToggleTheme, onSignOut, onGoHome,
-  onToday, onArchive, onOpenBgPanel, user,
+  onToday, onArchive, onOpenBgPanel, onOnboarding, user,
   mapName, mapColor,
   sticky = false,
 }) {
@@ -180,6 +181,7 @@ export function AppHeader({ theme, themeName, onToggleTheme, onSignOut, onGoHome
               onToggleTheme={onToggleTheme} onSignOut={onSignOut}
               onToday={onToday} onArchive={onArchive}
               onOpenBgPanel={onOpenBgPanel}
+              onOnboarding={onOnboarding}
               user={user}
               onClose={close}
             />

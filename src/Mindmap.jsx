@@ -7,7 +7,7 @@ import { ensureNotificationPermission } from "./notifications";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
 import { boostTheme } from "./theme";
-import { MindmapHint, ChildNodeHint } from "./Onboarding";
+import { OnboardingBanner } from "./Onboarding";
 import {
   COLORS, PRIORITY_COLORS, genId,
   toLocalInput, fromLocalInput, formatDeadline,
@@ -684,7 +684,7 @@ export default function Mindmap({
   onUpdateTree, user, onSignOut, theme: themeProp, themeName, onToggleTheme,
   nodeShape = "circle", onToggleShape = () => {}, onGoHome,
   taskId, onNavigateTask, onNavigateMap,
-  bgUrl, onOpenBgPanel,
+  bgUrl, onOpenBgPanel, onboarding,
 }) {
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [navPath, setNavPath]         = useState(["root"]);
@@ -847,7 +847,8 @@ export default function Mindmap({
     setTree(t => addChild(t, pid, { id: newId, text: "Новая задача", done: false, description: "", checklist: [], children: [] }));
     setNewTaskIds(prev => new Set([...prev, newId]));
     setTimeout(() => setNewTaskIds(prev => { const s = new Set(prev); s.delete(newId); return s; }), 600);
-  }, [setTree]);
+    onboarding?.completeStep("add-child");
+  }, [setTree, onboarding]);
 
   const handleDelete = useCallback((id) => {
     setTree(t => removeNode(t, id));
@@ -912,6 +913,7 @@ export default function Mindmap({
             onSignOut={onSignOut} onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel}
             onToday={() => setOverlayMode("today")}
             onArchive={() => setOverlayMode("archive")}
+            onOnboarding={onboarding?.restart}
             user={user}
             mapName={activeMap?.name}
             mapColor={COLORS[colorIdx % COLORS.length].bg}
@@ -960,7 +962,7 @@ export default function Mindmap({
           {/* Center card */}
           <NodeCard node={navNode} colorIdx={centerColorIdx} level={0}
             onNavigate={undefined}
-            onEdit={() => setSelectedId(navNodeId)}
+            onEdit={() => { setSelectedId(navNodeId); onboarding?.completeStep("select-node"); onboarding?.completeStep("edit-node"); }}
             theme={theme}
             singleTapEdit />
 
@@ -981,7 +983,7 @@ export default function Mindmap({
                   child={child} childIdx={i}
                   onNavigate={navigateInto}
                   onNavigateGc={navigateIntoGc}
-                  onEdit={id => setSelectedId(id)}
+                  onEdit={id => { setSelectedId(id); onboarding?.completeStep("select-node"); onboarding?.completeStep("edit-node"); }}
                   theme={theme}
                   newTaskIds={newTaskIds}
                   onArchive={handleArchive}
@@ -1095,12 +1097,9 @@ export default function Mindmap({
         );
       })()}
 
-      {/* Onboarding hints */}
-      {!overlayMode && !selectedId && visChildren.length > 0 && (
-        <MindmapHint theme={theme} />
-      )}
-      {!overlayMode && !selectedId && visChildren.length === 1 && (
-        <ChildNodeHint theme={theme} />
+      {/* Onboarding */}
+      {!overlayMode && onboarding && (
+        <OnboardingBanner onboarding={onboarding} theme={theme} />
       )}
     </div>
   );

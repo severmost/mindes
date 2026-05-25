@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
 import { boostTheme } from "./theme";
-import { EmptyHomeHint } from "./Onboarding";
+import { EmptyHomeHint, OnboardingBanner } from "./Onboarding";
 import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
@@ -468,7 +468,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
 
 // ── Main component ──
-export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel }) {
+export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel, onboarding }) {
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [editing, setEditing] = useState(null);
   const [overlayMode, setOverlayMode] = useState(initialOverlay || null);
@@ -570,6 +570,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
         onSignOut={onSignOut} onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel}
         onToday={() => setOverlayMode("today")}
         onArchive={() => setOverlayMode("archive")}
+        onOnboarding={onboarding?.restart}
         user={user}
       />
 
@@ -600,7 +601,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 colorIdx={idx}
                 theme={theme}
                 isDesktop={isDesktop}
-                onOpen={() => onOpenMap(map.id)}
+                onOpen={() => { onOpenMap(map.id); onboarding?.completeStep("open-project"); }}
                 onEdit={() => setEditing({
                   id: map.id,
                   name: map.name,
@@ -612,7 +613,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 })}
               />
             ))}
-            <AddCard theme={theme} onClick={onAddMap} />
+            <AddCard theme={theme} onClick={() => { onAddMap(); onboarding?.completeStep("create-project"); }} />
           </div>
 
           {/* Обзор прогресса — только десктоп */}
@@ -788,6 +789,11 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
           </AppOverlay>
         );
       })()}
+
+      {/* Onboarding */}
+      {!overlayMode && !editing && onboarding && (
+        <OnboardingBanner onboarding={onboarding} theme={theme} />
+      )}
     </div>
   );
 }

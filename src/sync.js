@@ -149,20 +149,6 @@ export function useFirestoreSync(user) {
           };
         });
 
-        // Первый заход: создаём стартовую карту, если у пользователя ничего нет.
-        if (!initializedRef.current && list.length === 0) {
-          initializedRef.current = true;
-          const id = makeId();
-          await setDoc(doc(db, "users", user.uid, "maps", id), {
-            id,
-            name: "Мои задачи",
-            tree: sampleTree(),
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-          });
-          return; // дождёмся следующего snapshot
-        }
-
         initializedRef.current = true;
         setMaps(list);
         setLoading(false);

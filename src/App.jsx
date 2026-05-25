@@ -11,6 +11,7 @@ import ProjectsHome from "./ProjectsHome";
 import NotFound from "./NotFound";
 import InstallPrompt from "./InstallPrompt";
 import BackgroundPanel from "./BackgroundPanel";
+import { useOnboarding } from "./Onboarding";
 
 // Зарезервированные пути (не являются project ID)
 const RESERVED = new Set(["archive", "immediate", "notfound"]);
@@ -49,6 +50,7 @@ export default function App() {
   const shapeApi                  = useNodeShape();
   const { theme }                 = themeApi;
   const [showBgPanel, setShowBgPanel] = useState(false);
+  const onboarding = useOnboarding();
   const winW     = useWindowWidth();
   const isMobile = winW < 768;
 
@@ -190,6 +192,7 @@ export default function App() {
           onNavigateMap={navigateMap}
           bgUrl={bgUrl}
           onOpenBgPanel={() => setShowBgPanel(true)}
+          onboarding={onboarding}
         />
         {bgPanel}
         <InstallPrompt theme={theme} />
@@ -213,6 +216,7 @@ export default function App() {
         onOverlayClose={goHome}
         bgUrl={bgUrl}
         onOpenBgPanel={() => setShowBgPanel(true)}
+        onboarding={onboarding}
       />
       {bgPanel}
       <InstallPrompt theme={theme} />
