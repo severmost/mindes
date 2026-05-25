@@ -315,13 +315,13 @@ export function EmptyHomeHint({ theme }) {
       justifyContent: "center", padding: "48px 24px 16px", gap: 14,
       animation: "fadeIn .4s ease",
     }}>
-      <svg width="64" height="64" viewBox="0 0 72 72" fill="none" style={{ opacity: 0.18 }}>
-        <circle cx="36" cy="36" r="28" stroke={theme.text} strokeWidth="2.5" strokeDasharray="5 4"/>
-        <circle cx="36" cy="36" r="6" fill={theme.text}/>
-        <line x1="36" y1="14" x2="36" y2="22" stroke={theme.text} strokeWidth="2" strokeLinecap="round"/>
-        <line x1="36" y1="50" x2="36" y2="58" stroke={theme.text} strokeWidth="2" strokeLinecap="round"/>
-        <line x1="14" y1="36" x2="22" y2="36" stroke={theme.text} strokeWidth="2" strokeLinecap="round"/>
-        <line x1="50" y1="36" x2="58" y2="36" stroke={theme.text} strokeWidth="2" strokeLinecap="round"/>
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={{ opacity: 0.2 }}>
+        {/* Папка */}
+        <path d="M6 18 C6 15.8 7.8 14 10 14 L24 14 L28 19 L54 19 C56.2 19 58 20.8 58 23 L58 50 C58 52.2 56.2 54 54 54 L10 54 C7.8 54 6 52.2 6 50 Z"
+          stroke={theme.text} strokeWidth="2.5" strokeLinejoin="round" fill="none"/>
+        {/* Плюс внутри */}
+        <line x1="32" y1="30" x2="32" y2="44" stroke={theme.text} strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="25" y1="37" x2="39" y2="37" stroke={theme.text} strokeWidth="2.5" strokeLinecap="round"/>
       </svg>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 5 }}>Нет проектов</div>
