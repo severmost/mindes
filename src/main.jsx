@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 import App from "./App.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 
 // Service Worker — только для веба (не в Capacitor native)
 if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
@@ -26,6 +27,8 @@ if (window.Capacitor?.isNativePlatform?.()) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>
 );
