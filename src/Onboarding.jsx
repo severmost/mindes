@@ -124,9 +124,9 @@ function ArrowOverlay({ target: selector, bannerRef }) {
       const tr = el.getBoundingClientRect();
       const br = banner.getBoundingClientRect();
 
-      // Стрелка стартует из верхней середины баннера с отступом
+      // Стрелка стартует из центра баннера
       const x1 = br.left + br.width / 2;
-      const y1 = br.top - 10;
+      const y1 = br.top + br.height / 2;
 
       // Стрелка заканчивается у ближайшего края целевого элемента
       const tx = tr.left + tr.width  / 2;
