@@ -684,7 +684,7 @@ export default function Mindmap({
   onUpdateTree, user, onSignOut, theme: themeProp, themeName, onToggleTheme,
   nodeShape = "circle", onToggleShape = () => {}, onGoHome,
   taskId, onNavigateTask, onNavigateMap,
-  bgUrl, onOpenBgPanel, onboarding,
+  bgUrl, onOpenBgPanel, onboarding, onStartOnboarding,
 }) {
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [navPath, setNavPath]         = useState(["root"]);
@@ -913,7 +913,7 @@ export default function Mindmap({
             onSignOut={onSignOut} onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel}
             onToday={() => setOverlayMode("today")}
             onArchive={() => setOverlayMode("archive")}
-            onOnboarding={onboarding?.restart}
+            onOnboarding={onStartOnboarding}
             user={user}
             mapName={activeMap?.name}
             mapColor={COLORS[colorIdx % COLORS.length].bg}

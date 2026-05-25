@@ -129,6 +129,11 @@ export default function App() {
 
   const goHome = useCallback(() => push("/"), [push]);
 
+  const startOnboarding = useCallback(() => {
+    onboarding.restart();
+    push("/");
+  }, [onboarding, push]);
+
   const navigateTask = useCallback((pid, tid) => {
     push(`/${encodeURIComponent(pid)}/${encodeURIComponent(tid)}`);
   }, [push]);
@@ -193,6 +198,7 @@ export default function App() {
           bgUrl={bgUrl}
           onOpenBgPanel={() => setShowBgPanel(true)}
           onboarding={onboarding}
+          onStartOnboarding={startOnboarding}
         />
         {bgPanel}
         <InstallPrompt theme={theme} />
@@ -217,6 +223,7 @@ export default function App() {
         bgUrl={bgUrl}
         onOpenBgPanel={() => setShowBgPanel(true)}
         onboarding={onboarding}
+        onStartOnboarding={startOnboarding}
       />
       {bgPanel}
       <InstallPrompt theme={theme} />

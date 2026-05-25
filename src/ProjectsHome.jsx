@@ -470,7 +470,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
 
 // ── Main component ──
-export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel, onboarding }) {
+export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel, onboarding, onStartOnboarding }) {
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [editing, setEditing] = useState(null);
   const [overlayMode, setOverlayMode] = useState(initialOverlay || null);
@@ -572,7 +572,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
         onSignOut={onSignOut} onGoHome={onGoHome} onOpenBgPanel={onOpenBgPanel}
         onToday={() => setOverlayMode("today")}
         onArchive={() => setOverlayMode("archive")}
-        onOnboarding={onboarding?.restart}
+        onOnboarding={onStartOnboarding}
         user={user}
       />
 
@@ -603,7 +603,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 colorIdx={idx}
                 theme={theme}
                 isDesktop={isDesktop}
-                isFirst={idx === 0}
+                isFirst={idx === maps.length - 1}
                 onOpen={() => {
                   if (obWrongStep(onboarding, "open-project")) return;
                   onOpenMap(map.id);
