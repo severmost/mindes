@@ -26,7 +26,7 @@ export function MoonIcon({ size = 16 }) {
 // ── AppOverlay ───────────────────────────────────────────────────────────────
 // Full-screen overlay with swipe-down-to-close, animated slide-up entrance.
 // Replaces OverlayList (Mindmap) and HomeOverlay (ProjectsHome).
-export function AppOverlay({ title, children, theme, onClose, zIndex = 50 }) {
+export function AppOverlay({ title, children, theme, themeName, onClose, zIndex = 50, bgUrl }) {
   const touchStartY = useRef(0);
   return (
     <div
@@ -35,13 +35,23 @@ export function AppOverlay({ title, children, theme, onClose, zIndex = 50 }) {
       style={{
         position: "fixed", inset: 0,
         paddingTop: "env(safe-area-inset-top)",
-        background: theme.appBg, color: theme.text,
+        background: bgUrl
+          ? (themeName === "dark" ? "rgba(10,10,20,0.72)" : "rgba(238,242,255,0.72)")
+          : theme.appBg,
+        color: theme.text,
         zIndex,
         display: "flex", flexDirection: "column",
         fontFamily: "'Inter', sans-serif",
         animation: "overlaySlideUp .2s ease",
       }}
     >
+      {bgUrl && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: -1,
+          backgroundImage: `url(${bgUrl})`,
+          backgroundSize: "cover", backgroundPosition: "center",
+        }} />
+      )}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "16px 24px",

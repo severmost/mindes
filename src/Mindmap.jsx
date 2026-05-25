@@ -948,9 +948,6 @@ export default function Mindmap({
             </Fragment>
           );
         })}
-        <span style={{ fontSize: 11, color: theme.textHint, marginLeft: "auto", flexShrink: 0, paddingRight: 4, whiteSpace: "nowrap" }}>
-          {isMobile ? "долгий тап — изменить" : "двойной клик — изменить"}
-        </span>
       </div>
 
       {/* Main area */}
@@ -1025,12 +1022,6 @@ export default function Mindmap({
             + Добавить задачу
           </button>}
 
-          {/* Архивированные (если есть) */}
-          {archivedCount > 0 && (
-            <div style={{ marginTop: 14, fontSize: 11, color: theme.textHint, textAlign: "center", letterSpacing: 0.3 }}>
-              {archivedCount} в архиве · скрыто
-            </div>
-          )}
         </div>
 
         {/* Desktop stats panel */}
@@ -1081,7 +1072,7 @@ export default function Mindmap({
           </div>
         );
         return (
-          <AppOverlay title="Сегодня" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Сегодня" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
               : <><Section title="Просрочено" list={overdue} /><Section title="Сегодня" list={today} /><Section title="На неделе" list={week} /></>}
@@ -1093,7 +1084,7 @@ export default function Mindmap({
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <AppOverlay title="Архив" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Архив" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
               : items.map(t => {

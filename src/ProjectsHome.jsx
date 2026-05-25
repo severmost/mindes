@@ -712,7 +712,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
           </div>
         );
         return (
-          <AppOverlay title="Сегодня" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Сегодня" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
               : <><Section title="Просрочено" list={overdue2} /><Section title="Сегодня" list={today2} /><Section title="На неделе" list={week2} /></>}
@@ -730,7 +730,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
         ];
         const total = byPriority.high.length + byPriority.medium.length + byPriority.low.length;
         return (
-          <AppOverlay title="Приоритеты" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Приоритеты" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {total === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач с приоритетом</div>
               : sections.map(({ key, label, color }) => {
@@ -777,7 +777,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <AppOverlay title="Архив" theme={theme} onClose={closeOverlay}>
+          <AppOverlay title="Архив" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
               : items.map(t => {
