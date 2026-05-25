@@ -1,4 +1,26 @@
 /* ──────────────────────────────────────────────────────────────
+   Scrollbars — thin, theme-aware
+────────────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb, rgba(140,120,200,0.35)) transparent;
+}
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, rgba(140,120,200,0.35));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, rgba(140,120,200,0.6));
+}
+
+/* ──────────────────────────────────────────────────────────────
    Text selection — disabled globally, enabled only in inputs
 ────────────────────────────────────────────────────────────── */
 * {

@@ -23,6 +23,26 @@ export function MoonIcon({ size = 16 }) {
   );
 }
 
+// ── Glass style ──────────────────────────────────────────────────────────────
+// Жидкое стекло: backdrop-blur + полупрозрачный фон + тонкая белая рамка.
+// themeName — "dark" | "light"
+export function glassStyle(themeName) {
+  if (themeName === "dark") return {
+    background:           "rgba(15, 14, 35, 0.55)",
+    backdropFilter:       "blur(22px) saturate(160%)",
+    WebkitBackdropFilter: "blur(22px) saturate(160%)",
+    border:               "1px solid rgba(255,255,255,0.09)",
+    boxShadow:            "0 8px 32px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.06)",
+  };
+  return {
+    background:           "rgba(255, 255, 255, 0.60)",
+    backdropFilter:       "blur(22px) saturate(180%)",
+    WebkitBackdropFilter: "blur(22px) saturate(180%)",
+    border:               "1px solid rgba(255,255,255,0.88)",
+    boxShadow:            "0 8px 32px rgba(80,60,140,0.10), inset 0 1px 0 rgba(255,255,255,0.95)",
+  };
+}
+
 // ── AppOverlay ───────────────────────────────────────────────────────────────
 // Full-screen overlay with swipe-down-to-close, animated slide-up entrance.
 // Replaces OverlayList (Mindmap) and HomeOverlay (ProjectsHome).
@@ -36,7 +56,9 @@ export function AppOverlay({ title, children, theme, themeName, onClose, zIndex 
         position: "fixed", inset: 0,
         paddingTop: "env(safe-area-inset-top)",
         background: bgUrl
-          ? (themeName === "dark" ? "rgba(10,10,20,0.72)" : "rgba(238,242,255,0.72)")
+          ? (themeName === "dark"
+              ? `linear-gradient(rgba(10,10,20,0.72),rgba(10,10,20,0.72)) center/cover, url(${bgUrl}) center/cover no-repeat`
+              : `linear-gradient(rgba(238,242,255,0.72),rgba(238,242,255,0.72)) center/cover, url(${bgUrl}) center/cover no-repeat`)
           : theme.appBg,
         color: theme.text,
         zIndex,
@@ -45,13 +67,6 @@ export function AppOverlay({ title, children, theme, themeName, onClose, zIndex 
         animation: "overlaySlideUp .2s ease",
       }}
     >
-      {bgUrl && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: -1,
-          backgroundImage: `url(${bgUrl})`,
-          backgroundSize: "cover", backgroundPosition: "center",
-        }} />
-      )}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "16px 24px",
@@ -80,10 +95,8 @@ export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
     <div
       style={{
         position: "absolute", top: 50, right: 0, zIndex: 40,
-        background: theme.panelBg,
-        border: `1px solid ${theme.surfaceBorder}`,
+        ...glassStyle(themeName),
         borderRadius: 14, padding: "8px 0", minWidth: 190,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
         animation: "menuIn .18s ease",
       }}
       onClick={e => e.stopPropagation()}

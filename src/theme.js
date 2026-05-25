@@ -126,8 +126,10 @@ function applyThemeCssVars(t) {
     "--text-faint":          t.textFaint,
     "--section-label":       t.sectionLabel,
     "--progress-track":      t.progressTrack,
-    "--delete-bg":           t.deleteBg,
-    "--delete-border":       t.deleteBorder,
+    "--delete-bg":              t.deleteBg,
+    "--delete-border":          t.deleteBorder,
+    "--scrollbar-thumb":        t.name === "dark" ? "rgba(140,120,200,0.28)" : "rgba(100,90,160,0.22)",
+    "--scrollbar-thumb-hover":  t.name === "dark" ? "rgba(160,140,220,0.55)" : "rgba(100,90,160,0.45)",
   };
   Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
 }

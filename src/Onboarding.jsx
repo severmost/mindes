@@ -3,6 +3,7 @@
 // когда соответствующее действие сделано впервые.
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { glassStyle } from "./ui";
 
 // ─── Шаги ────────────────────────────────────────────────────────────────────
 export const STEPS = [
@@ -365,15 +366,12 @@ function bannerStyle(theme) {
     position: "fixed", bottom: 20, left: "50%",
     transform: "translateX(-50%)",
     zIndex: 30,
-    background: theme.panelBg,
-    border: `1px solid ${theme.surfaceBorder}`,
+    ...glassStyle(theme.name),
     borderRadius: 16,
     padding: "14px 18px",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.28)",
     display: "flex", alignItems: "center", gap: 12,
     maxWidth: 380, width: "calc(100vw - 32px)",
     animation: "overlaySlideUp .25s ease",
     boxSizing: "border-box",
-    position: "fixed",
   };
 }

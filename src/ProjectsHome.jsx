@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useWindowWidth } from "./hooks";
-import { AppHeader, AppOverlay } from "./ui";
+import { AppHeader, AppOverlay, glassStyle } from "./ui";
 import { boostTheme } from "./theme";
 import { EmptyHomeHint, OnboardingBanner, obWrongStep } from "./Onboarding";
 import {
@@ -35,7 +35,7 @@ function countByPriority(node) {
 }
 
 // ── Stats bar (desktop) ──
-function StatsBar({ maps, overdue, today, theme, onOpenPriorities }) {
+function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) {
   let totalTasks = 0, totalDone = 0;
   const pri = { high: 0, medium: 0, low: 0, none: 0 };
   maps.forEach(m => {
@@ -58,8 +58,8 @@ function StatsBar({ maps, overdue, today, theme, onOpenPriorities }) {
     <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "stretch" }}>
       {chips.map(ch => (
         <div key={ch.label} style={{
-          flex: "1 1 100px", background: theme.surfaceBg,
-          border: `1px solid ${theme.surfaceBorderSoft}`, borderRadius: 12, padding: "12px 16px",
+          flex: "1 1 100px", borderRadius: 12, padding: "12px 16px",
+          ...glassStyle(themeName),
         }}>
           <div style={{ fontSize: 22, fontWeight: 800, color: ch.color, lineHeight: 1 }}>{ch.value}</div>
           <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4, fontWeight: 500 }}>{ch.label}</div>
@@ -67,14 +67,14 @@ function StatsBar({ maps, overdue, today, theme, onOpenPriorities }) {
       ))}
       {/* Шкала приоритетов */}
       <div onClick={onOpenPriorities} style={{
-        flex: "2 1 180px", background: theme.surfaceBg,
-        border: `1px solid ${theme.surfaceBorderSoft}`, borderRadius: 12, padding: "12px 16px",
+        flex: "2 1 180px", borderRadius: 12, padding: "12px 16px",
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: onOpenPriorities ? "pointer" : "default",
-        transition: "background .12s",
+        transition: "background .15s",
+        ...glassStyle(themeName),
       }}
-      onMouseEnter={e => { if (onOpenPriorities) e.currentTarget.style.background = theme.surfaceBgHover; }}
-      onMouseLeave={e => { if (onOpenPriorities) e.currentTarget.style.background = theme.surfaceBg; }}
+      onMouseEnter={e => { if (onOpenPriorities) e.currentTarget.style.background = themeName === "dark" ? "rgba(25,22,55,0.70)" : "rgba(255,255,255,0.80)"; }}
+      onMouseLeave={e => { if (onOpenPriorities) e.currentTarget.style.background = themeName === "dark" ? "rgba(15,14,35,0.55)" : "rgba(255,255,255,0.60)"; }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <span style={{ fontSize: 12, color: theme.textDim, fontWeight: 500 }}>Приоритеты</span>
@@ -105,11 +105,11 @@ function StatsBar({ maps, overdue, today, theme, onOpenPriorities }) {
 }
 
 // ── Projects overview (desktop) ──
-function ProjectsOverview({ maps, theme, onOpenMap }) {
+function ProjectsOverview({ maps, theme, themeName, onOpenMap }) {
   if (!maps.length) return null;
   return (
-    <div style={{ marginTop: 28 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10 }}>
+    <div style={{ marginTop: 28, borderRadius: 16, padding: "14px 12px", ...glassStyle(themeName) }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10, paddingLeft: 4 }}>
         Прогресс (все задачи)
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -588,7 +588,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
         <div style={{ flex: 1, minWidth: 0 }}>
           {/* Stats bar — только десктоп */}
           {isDesktop && (
-            <StatsBar maps={maps} overdue={overdue} today={today} theme={theme} onOpenPriorities={() => setOverlayMode("priorities")} />
+            <StatsBar maps={maps} overdue={overdue} today={today} theme={theme} themeName={themeName} onOpenPriorities={() => setOverlayMode("priorities")} />
           )}
 
           {maps.length === 0
@@ -629,7 +629,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
 
           {/* Обзор прогресса — только десктоп */}
           {isDesktop && (
-            <ProjectsOverview maps={maps} theme={theme} onOpenMap={onOpenMap} />
+            <ProjectsOverview maps={maps} theme={theme} themeName={themeName} onOpenMap={onOpenMap} />
           )}
 
           {/* Deadline panel below cards on mobile */}
@@ -640,8 +640,8 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
           {/* Статистика на мобайле — после всех блоков */}
           {!isDesktop && (
             <>
-              <StatsBar maps={maps} overdue={overdue} today={today} theme={theme} onOpenPriorities={() => setOverlayMode("priorities")} />
-              <ProjectsOverview maps={maps} theme={theme} onOpenMap={onOpenMap} />
+              <StatsBar maps={maps} overdue={overdue} today={today} theme={theme} themeName={themeName} onOpenPriorities={() => setOverlayMode("priorities")} />
+              <ProjectsOverview maps={maps} theme={theme} themeName={themeName} onOpenMap={onOpenMap} />
             </>
           )}
         </div>
@@ -750,7 +750,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                       ? <div style={{ color: theme.textDim, fontSize: 13, padding: "6px 0 0 18px" }}>—</div>
                       : list.map(task => {
                         const co = COLORS[(task.colorIdx ?? 0) % COLORS.length];
-                        const dl = task.deadline ? fmtDeadline(new Date(task.deadline)) : null;
+                        const dl = task.deadline ? formatDeadline(new Date(task.deadline)) : null;
                         return (
                           <div key={`${task.mapId}/${task.id}`}
                             onClick={() => { onNavigateTask?.(task.mapId, task.id); closeOverlay(); }}

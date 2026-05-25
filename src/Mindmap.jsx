@@ -5,7 +5,7 @@
 import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { ensureNotificationPermission } from "./notifications";
 import { useWindowWidth } from "./hooks";
-import { AppHeader, AppOverlay } from "./ui";
+import { AppHeader, AppOverlay, glassStyle } from "./ui";
 import { boostTheme } from "./theme";
 import { OnboardingBanner, obWrongStep } from "./Onboarding";
 import {
@@ -127,7 +127,7 @@ function BranchStats({ node, theme, onAdd }) {
 }
 
 // ── Side Panel ──
-function SidePanel({ node, tree, setTree, onClose, onDelete, theme, isMobile }) {
+function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, isMobile }) {
   if (!node) return null;
   const allDone = isAllDone(node);
   const { total, done } = countTasks(node);
@@ -242,10 +242,11 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, isMobile }) 
     };
   }, [isMobile, onClose]);
 
+  const glass = glassStyle(themeName);
   const sheetStyle = {
     position: "fixed",
     zIndex: 300,
-    background: theme.panelBg,
+    ...glass,
     display: "flex", flexDirection: "column",
     fontFamily: "'Inter', sans-serif", color: theme.text,
     overflow: "hidden",
@@ -262,7 +263,6 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, isMobile }) 
       width: 520,
       borderRadius: 20,
       maxHeight: "88vh",
-      boxShadow: "0 24px 64px rgba(0,0,0,0.32)",
     }),
   };
 
@@ -1035,7 +1035,7 @@ export default function Mindmap({
         <SidePanel node={editNode} tree={tree} setTree={setTree}
           onClose={closeSidePanel}
           onDelete={handleDelete}
-          theme={theme} isMobile={isMobile} />
+          theme={theme} themeName={themeName} isMobile={isMobile} />
       )}
 
       {/* Overlay: Today */}
