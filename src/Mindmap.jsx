@@ -1,6 +1,6 @@
-// Mindmap: иерархический карточный список вместо SVG-радиала.
-// Навигация: клик по дочерней/внучатой карте → она становится центром.
-// Редактирование: двойной клик/долгий тап → панель редактирования.
+// Просмотр проекта: иерархический список задач с навигацией по уровням.
+// Навигация: клик по дочернему узлу → он становится центром.
+// Редактирование: двойной клик/долгий тап → открывает окно задачи.
 
 import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { ensureNotificationPermission } from "./notifications";
@@ -771,7 +771,7 @@ export default function Mindmap({
     onUpdateTree(activeMap.id, updater);
   }, [activeMap, onUpdateTree]);
 
-  // Сброс при смене карты
+  // Сброс при смене проекта
   useEffect(() => {
     setNavPath(["root"]);
     lastSyncedTaskIdRef.current = null;

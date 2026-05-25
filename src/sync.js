@@ -144,8 +144,8 @@ export function useFirestoreSync(user) {
           const data = d.data();
           return {
             id: d.id,
-            name: data.name || "Карта",
-            tree: data.tree || defaultTree(data.name || "Карта"),
+            name: data.name || "Проект",
+            tree: data.tree || defaultTree(data.name || "Проект"),
           };
         });
 
@@ -251,7 +251,7 @@ export function useFirestoreSync(user) {
   async function addMap() {
     if (!user) return;
     const id = makeId();
-    const name = "Новая карта";
+    const name = "Новый проект";
     const tree = defaultTree(name);
     setMaps((prev) => [...prev, { id, name, tree }]);
     setActiveMapId(id);

@@ -36,13 +36,6 @@ export const STEPS = [
     target: "[data-ob='center-node']",
   },
   {
-    id:     "edit-node",
-    emoji:  "✏️",
-    title:  "Двойной клик или долгий тап",
-    sub:    "На дочернем узле — откроется редактирование",
-    target: "[data-ob='child-node']",
-  },
-  {
     id:     "add-child",
     emoji:  "➕",
     title:  "Добавьте подзадачу",
@@ -50,10 +43,17 @@ export const STEPS = [
     target: "[data-ob='add-button']",
   },
   {
+    id:     "edit-node",
+    emoji:  "✏️",
+    title:  "Двойной клик или долгий тап",
+    sub:    "На дочернем узле — откроется редактирование",
+    target: "[data-ob='child-node']",
+  },
+  {
     id:     "navigate-into",
     emoji:  "🔍",
     title:  "Провалитесь глубже",
-    sub:    "Один клик / тап на дочернем или внучатом узле — переход на его уровень",
+    sub:    "Один клик / тап на дочернем узле — переход на его уровень",
     target: "[data-ob='child-node']",
   },
 ];
@@ -133,7 +133,9 @@ function ArrowOverlay({ target: selector, bannerRef }) {
       const ty = tr.top  + tr.height / 2;
 
       // Если цель выше баннера — идём вверх; ниже — вниз (редко)
-      const endY = ty > y1 ? tr.top  : tr.bottom;
+      // Отступ 10px от края элемента чтобы стрелка не прилипала
+      const GAP = 10;
+      const endY = ty > y1 ? tr.top - GAP : tr.bottom + GAP;
       const endX = tx;
 
       setPts({ x1, y1, x2: endX, y2: endY });
@@ -165,12 +167,14 @@ function ArrowOverlay({ target: selector, bannerRef }) {
   const tx = x2 - cpx, ty2 = y2 - cpy;
   const len = Math.sqrt(tx * tx + ty2 * ty2) || 1;
   const nx = tx / len, ny = ty2 / len;
-  const AS = 11; // arrowhead size
+  const AS = 8; // arrowhead size
 
   const ah1x = x2 - AS * nx + AS * 0.5 * ny;
   const ah1y = y2 - AS * ny - AS * 0.5 * nx;
   const ah2x = x2 - AS * nx - AS * 0.5 * ny;
   const ah2y = y2 - AS * ny + AS * 0.5 * nx;
+
+  const COLOR = "rgba(130,130,145,0.7)";
 
   return (
     <svg
@@ -181,35 +185,19 @@ function ArrowOverlay({ target: selector, bannerRef }) {
         overflow: "visible",
       }}
     >
-      <defs>
-        <filter id="ob-glow">
-          <feGaussianBlur stdDeviation="2" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      {/* Тень */}
-      <path
-        d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
-        stroke="rgba(0,0,0,0.18)" strokeWidth="4"
-        fill="none" strokeLinecap="round"
-        strokeDasharray="7 5"
-      />
       {/* Основная линия */}
       <path
         d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
-        stroke="#5b3fc4" strokeWidth="2.5"
+        stroke={COLOR} strokeWidth="1.5"
         fill="none" strokeLinecap="round"
-        strokeDasharray="7 5"
-        opacity="0.85"
-        filter="url(#ob-glow)"
+        strokeDasharray="6 5"
         style={{ animation: "obDash 1.2s linear infinite" }}
       />
       {/* Наконечник */}
       <path
         d={`M ${ah1x} ${ah1y} L ${x2} ${y2} L ${ah2x} ${ah2y}`}
-        stroke="#5b3fc4" strokeWidth="2.5"
+        stroke={COLOR} strokeWidth="1.5"
         fill="none" strokeLinecap="round" strokeLinejoin="round"
-        opacity="0.85"
       />
       <style>{`
         @keyframes obDash {
