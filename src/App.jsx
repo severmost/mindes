@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, lazy, Suspense } from "react";
 import { watchAuth, signOut } from "./auth";
 import { useFirestoreSync } from "./sync";
 import { useTheme, useNodeShape } from "./theme";
@@ -6,12 +6,14 @@ import { useBackground } from "./background";
 import { useWindowWidth } from "./hooks";
 import { collectTasksWithReminders, scheduleReminder, cancelReminder } from "./notifications";
 import Login from "./Login";
-import Mindmap from "./Mindmap";
-import ProjectsHome from "./ProjectsHome";
 import NotFound from "./NotFound";
 import InstallPrompt from "./InstallPrompt";
 import BackgroundPanel from "./BackgroundPanel";
 import { useOnboarding } from "./Onboarding";
+
+// Тяжёлые компоненты грузятся только когда нужны
+const Mindmap      = lazy(() => import("./Mindmap"));
+const ProjectsHome = lazy(() => import("./ProjectsHome"));
 
 // Зарезервированные пути (не являются project ID)
 const RESERVED = new Set(["archive", "immediate", "notfound"]);
@@ -181,7 +183,7 @@ export default function App() {
   if (showMindmap) {
     const activeId = sync.activeMapId || routePid;
     return (
-      <>
+      <Suspense fallback={splash("Загрузка…")}>
         {bgLayer}
         <Mindmap
           user={user}
@@ -202,13 +204,13 @@ export default function App() {
         />
         {bgPanel}
         <InstallPrompt theme={theme} />
-      </>
+      </Suspense>
     );
   }
 
   // ── Home / Archive / Immediate view ──
   return (
-    <>
+    <Suspense fallback={splash("Загрузка…")}>
       {bgLayer}
       <ProjectsHome
         maps={sync.maps}
@@ -227,6 +229,6 @@ export default function App() {
       />
       {bgPanel}
       <InstallPrompt theme={theme} />
-    </>
+    </Suspense>
   );
 }
