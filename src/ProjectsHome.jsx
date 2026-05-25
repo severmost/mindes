@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
 import { boostTheme } from "./theme";
+import { EmptyHomeHint } from "./Onboarding";
 import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
@@ -587,6 +588,10 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
             <StatsBar maps={maps} overdue={overdue} today={today} theme={theme} onOpenPriorities={() => setOverlayMode("priorities")} />
           )}
 
+          {maps.length === 0
+            ? <EmptyHomeHint theme={theme} />
+            : null
+          }
           <div style={{ display: "grid", gridTemplateColumns: cardCols, gap: 12 }}>
             {maps.map((map, idx) => (
               <ProjectCard

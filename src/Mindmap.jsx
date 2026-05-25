@@ -7,6 +7,7 @@ import { ensureNotificationPermission } from "./notifications";
 import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay } from "./ui";
 import { boostTheme } from "./theme";
+import { MindmapHint, ChildNodeHint } from "./Onboarding";
 import {
   COLORS, PRIORITY_COLORS, genId,
   toLocalInput, fromLocalInput, formatDeadline,
@@ -1093,6 +1094,14 @@ export default function Mindmap({
           </AppOverlay>
         );
       })()}
+
+      {/* Onboarding hints */}
+      {!overlayMode && !selectedId && visChildren.length > 0 && (
+        <MindmapHint theme={theme} />
+      )}
+      {!overlayMode && !selectedId && visChildren.length === 1 && (
+        <ChildNodeHint theme={theme} />
+      )}
     </div>
   );
 }
