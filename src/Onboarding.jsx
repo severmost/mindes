@@ -1,46 +1,53 @@
 // Onboarding — пошаговое обучение новых пользователей.
 // Состояние хранится в localStorage; шаги завершаются автоматически
 // когда соответствующее действие сделано впервые.
-//
-// Использование:
-//   const ob = useOnboarding();
-//   <OnboardingBanner onboarding={ob} theme={theme} />
-//   ob.completeStep("create-project");
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 
 // ─── Шаги ────────────────────────────────────────────────────────────────────
+// target: CSS-селектор элемента, к которому рисуется стрелка
 export const STEPS = [
   {
-    id:      "create-project",
-    emoji:   "📁",
-    title:   "Создайте первый проект",
-    sub:     "Нажмите на карточку «Новый проект» ниже",
-    arrow:   true,           // показываем стрелку вниз
+    id:     "create-project",
+    emoji:  "📁",
+    title:  "Создайте первый проект",
+    sub:    "Нажмите на карточку «+»",
+    target: "[data-ob='add-card']",
   },
   {
-    id:      "open-project",
-    emoji:   "👆",
-    title:   "Откройте проект",
-    sub:     "Нажмите на карточку проекта",
+    id:     "open-project",
+    emoji:  "👆",
+    title:  "Откройте проект",
+    sub:    "Нажмите на карточку проекта",
+    target: "[data-ob='project-card']",
   },
   {
-    id:      "select-node",
-    emoji:   "🎯",
-    title:   "Нажмите на узел",
-    sub:     "Выберите любой узел — справа откроется панель",
+    id:     "select-node",
+    emoji:  "🎯",
+    title:  "Нажмите на узел",
+    sub:    "Откроется окно с деталями задачи",
+    target: "[data-ob='center-node']",
   },
   {
-    id:      "edit-node",
-    emoji:   "✏️",
-    title:   "Двойной клик или долгий тап",
-    sub:     "Чтобы открыть подробное редактирование задачи",
+    id:     "edit-node",
+    emoji:  "✏️",
+    title:  "Двойной клик или долгий тап",
+    sub:    "На дочернем узле — откроется редактирование",
+    target: "[data-ob='child-node']",
   },
   {
-    id:      "add-child",
-    emoji:   "➕",
-    title:   "Добавьте подзадачу",
-    sub:     "Нажмите «+» в панели справа",
+    id:     "add-child",
+    emoji:  "➕",
+    title:  "Добавьте подзадачу",
+    sub:    "Нажмите «+ Добавить задачу»",
+    target: "[data-ob='add-button']",
+  },
+  {
+    id:     "navigate-into",
+    emoji:  "🔍",
+    title:  "Провалитесь глубже",
+    sub:    "Один клик / тап на дочернем или внучатом узле — переход на его уровень",
+    target: "[data-ob='child-node']",
   },
 ];
 
@@ -51,7 +58,6 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  // Новый пользователь — показываем онбординг
   return { completed: [], done: false };
 }
 
@@ -63,7 +69,6 @@ function saveState(s) {
 export function useOnboarding() {
   const [state, setState] = useState(loadState);
 
-  // Текущий шаг — первый незавершённый
   const currentStep = state.done
     ? null
     : STEPS.find(s => !state.completed.includes(s.id)) ?? null;
@@ -74,11 +79,9 @@ export function useOnboarding() {
     setState(prev => {
       if (prev.done) return prev;
       if (prev.completed.includes(id)) return prev;
-      // Завершаем только если это текущий шаг (или предыдущий был пропущен)
-      const stepIdx     = STEPS.findIndex(s => s.id === id);
-      const currentIdx  = STEPS.findIndex(s => !prev.completed.includes(s.id));
+      const stepIdx    = STEPS.findIndex(s => s.id === id);
+      const currentIdx = STEPS.findIndex(s => !prev.completed.includes(s.id));
       if (stepIdx !== currentIdx) return prev;
-
       const completed = [...prev.completed, id];
       const allDone   = completed.length === STEPS.length;
       const next = { ...prev, completed, done: allDone };
@@ -88,45 +91,153 @@ export function useOnboarding() {
   }, []);
 
   const skip = useCallback(() => {
-    setState(prev => {
-      const next = { ...prev, done: true };
-      saveState(next);
-      return next;
-    });
+    setState(prev => { const n = { ...prev, done: true }; saveState(n); return n; });
   }, []);
 
   const restart = useCallback(() => {
-    const next = { completed: [], done: false };
-    saveState(next);
-    setState(next);
+    const n = { completed: [], done: false };
+    saveState(n); setState(n);
   }, []);
 
   return { isActive, currentStep, state, completeStep, skip, restart };
 }
 
+// ─── Стрелка к целевому элементу ─────────────────────────────────────────────
+function ArrowOverlay({ target: selector, bannerRef }) {
+  const [pts, setPts] = useState(null);
+
+  useLayoutEffect(() => {
+    if (!selector) { setPts(null); return; }
+
+    function measure() {
+      const el     = document.querySelector(selector);
+      const banner = bannerRef?.current;
+      if (!el || !banner) { setPts(null); return; }
+
+      const tr = el.getBoundingClientRect();
+      const br = banner.getBoundingClientRect();
+
+      // Стрелка стартует из верхней середины баннера
+      const x1 = br.left + br.width / 2;
+      const y1 = br.top;
+
+      // Стрелка заканчивается у ближайшего края целевого элемента
+      const tx = tr.left + tr.width  / 2;
+      const ty = tr.top  + tr.height / 2;
+
+      // Если цель выше баннера — идём вверх; ниже — вниз (редко)
+      const endY = ty > y1 ? tr.top  : tr.bottom;
+      const endX = tx;
+
+      setPts({ x1, y1, x2: endX, y2: endY });
+    }
+
+    measure();
+    window.addEventListener("resize",   measure);
+    window.addEventListener("scroll",   measure, true);
+    // Повторяем замер через 100 мс — элемент может ещё не отрендерился
+    const t = setTimeout(measure, 120);
+    return () => {
+      window.removeEventListener("resize",  measure);
+      window.removeEventListener("scroll",  measure, true);
+      clearTimeout(t);
+    };
+  }, [selector]);
+
+  if (!pts) return null;
+
+  const { x1, y1, x2, y2 } = pts;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  // Контрольная точка для кривой Безье — смещаем к цели горизонтально
+  const cpx = x1 + dx * 0.4;
+  const cpy = y1 + dy * 0.1;
+
+  // Вектор в конечной точке (для стрелки)
+  const tx = x2 - cpx, ty2 = y2 - cpy;
+  const len = Math.sqrt(tx * tx + ty2 * ty2) || 1;
+  const nx = tx / len, ny = ty2 / len;
+  const AS = 11; // arrowhead size
+
+  const ah1x = x2 - AS * nx + AS * 0.5 * ny;
+  const ah1y = y2 - AS * ny - AS * 0.5 * nx;
+  const ah2x = x2 - AS * nx - AS * 0.5 * ny;
+  const ah2y = y2 - AS * ny + AS * 0.5 * nx;
+
+  return (
+    <svg
+      style={{
+        position: "fixed", inset: 0,
+        width: "100%", height: "100%",
+        zIndex: 28, pointerEvents: "none",
+        overflow: "visible",
+      }}
+    >
+      <defs>
+        <filter id="ob-glow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Тень */}
+      <path
+        d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
+        stroke="rgba(0,0,0,0.18)" strokeWidth="4"
+        fill="none" strokeLinecap="round"
+        strokeDasharray="7 5"
+      />
+      {/* Основная линия */}
+      <path
+        d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
+        stroke="#5b3fc4" strokeWidth="2.5"
+        fill="none" strokeLinecap="round"
+        strokeDasharray="7 5"
+        opacity="0.85"
+        filter="url(#ob-glow)"
+        style={{ animation: "obDash 1.2s linear infinite" }}
+      />
+      {/* Наконечник */}
+      <path
+        d={`M ${ah1x} ${ah1y} L ${x2} ${y2} L ${ah2x} ${ah2y}`}
+        stroke="#5b3fc4" strokeWidth="2.5"
+        fill="none" strokeLinecap="round" strokeLinejoin="round"
+        opacity="0.85"
+      />
+      <style>{`
+        @keyframes obDash {
+          from { stroke-dashoffset: 0; }
+          to   { stroke-dashoffset: -24; }
+        }
+      `}</style>
+    </svg>
+  );
+}
+
 // ─── Баннер ──────────────────────────────────────────────────────────────────
 export function OnboardingBanner({ onboarding, theme }) {
-  const { isActive, currentStep, state, completeStep: _, skip } = onboarding;
+  const { isActive, currentStep, state, skip } = onboarding;
   const [justFinished, setJustFinished] = useState(false);
-  const prevDone = useRef(state.done);
+  const prevDone  = useRef(state.done);
+  const bannerRef = useRef(null);
 
-  // Показываем "Отлично!" когда все шаги пройдены
   useEffect(() => {
     if (state.done && !prevDone.current) {
       setJustFinished(true);
-      const t = setTimeout(() => setJustFinished(false), 3000);
+      const t = setTimeout(() => setJustFinished(false), 3500);
       return () => clearTimeout(t);
     }
     prevDone.current = state.done;
   }, [state.done]);
 
+  // «Отлично!»
   if (justFinished) {
     return (
-      <div style={bannerStyle(theme)}>
+      <div ref={bannerRef} style={bannerStyle(theme)}>
         <span style={{ fontSize: 22 }}>🎉</span>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>Отлично! Обучение пройдено</div>
-          <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>Вы можете вернуться к нему через меню</div>
+          <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>Вернуться можно через меню → Обучение</div>
         </div>
       </div>
     );
@@ -134,18 +245,18 @@ export function OnboardingBanner({ onboarding, theme }) {
 
   if (!isActive || !currentStep) return null;
 
-  const stepIdx   = STEPS.findIndex(s => s.id === currentStep.id);
-  const total     = STEPS.length;
+  const stepIdx = STEPS.findIndex(s => s.id === currentStep.id);
+  const total   = STEPS.length;
 
   return (
     <>
-      <div style={bannerStyle(theme)}>
-        {/* Шаг */}
-        <div style={{ flexShrink: 0, textAlign: "center", minWidth: 28 }}>
-          <span style={{ fontSize: 20 }}>{currentStep.emoji}</span>
-        </div>
+      {/* Стрелка */}
+      <ArrowOverlay target={currentStep.target} bannerRef={bannerRef} />
 
-        {/* Текст */}
+      {/* Баннер */}
+      <div ref={bannerRef} data-ob-banner style={bannerStyle(theme)}>
+        <span style={{ fontSize: 20, flexShrink: 0 }}>{currentStep.emoji}</span>
+
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>
@@ -160,7 +271,6 @@ export function OnboardingBanner({ onboarding, theme }) {
           </div>
         </div>
 
-        {/* Пропустить */}
         <button onClick={skip} style={{
           background: "none", border: "none", cursor: "pointer",
           color: theme.textMuted, fontSize: 12, padding: "4px 0 4px 8px",
@@ -173,67 +283,24 @@ export function OnboardingBanner({ onboarding, theme }) {
 
       {/* Прогресс-точки */}
       <div style={{
-        position: "fixed", bottom: 76, left: "50%", transform: "translateX(-50%)",
-        display: "flex", gap: 5, zIndex: 29,
+        position: "fixed", bottom: 90, left: "50%", transform: "translateX(-50%)",
+        display: "flex", gap: 5, zIndex: 29, pointerEvents: "none",
       }}>
         {STEPS.map((s, i) => (
           <div key={s.id} style={{
-            width: i === stepIdx ? 18 : 6,
-            height: 6, borderRadius: 3,
+            width: i === stepIdx ? 18 : 6, height: 6, borderRadius: 3,
             background: state.completed.includes(s.id)
               ? "#5b3fc4"
-              : i === stepIdx
-                ? "#5b3fc480"
-                : theme.surfaceBorder,
+              : i === stepIdx ? "#5b3fc480" : theme.surfaceBorder,
             transition: "all .25s ease",
           }} />
         ))}
       </div>
-
-      {/* Стрелка вниз для шага create-project */}
-      {currentStep.arrow && (
-        <div style={{
-          position: "fixed", bottom: 100, left: "50%", transform: "translateX(-50%)",
-          zIndex: 29, animation: "arrowBounce 1.4s ease-in-out infinite",
-          pointerEvents: "none",
-        }}>
-          <svg width="22" height="36" viewBox="0 0 22 36" fill="none">
-            <path d="M11 2 L11 28" stroke={theme.text} strokeWidth="2" strokeLinecap="round" opacity="0.4"/>
-            <path d="M3 20 L11 30 L19 20" stroke={theme.text} strokeWidth="2"
-              strokeLinecap="round" strokeLinejoin="round" opacity="0.4"/>
-          </svg>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes arrowBounce {
-          0%, 100% { transform: translateX(-50%) translateY(0); }
-          50%       { transform: translateX(-50%) translateY(7px); }
-        }
-      `}</style>
     </>
   );
 }
 
-// ─── Стиль баннера ────────────────────────────────────────────────────────────
-function bannerStyle(theme) {
-  return {
-    position: "fixed", bottom: 20, left: "50%",
-    transform: "translateX(-50%)",
-    zIndex: 30,
-    background: theme.panelBg,
-    border: `1px solid ${theme.surfaceBorder}`,
-    borderRadius: 16,
-    padding: "14px 18px",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-    display: "flex", alignItems: "center", gap: 12,
-    maxWidth: 380, width: "calc(100vw - 32px)",
-    animation: "overlaySlideUp .25s ease",
-    boxSizing: "border-box",
-  };
-}
-
-// ─── Пустой экран (когда нет проектов и онбординг не активен) ────────────────
+// ─── Пустой экран ─────────────────────────────────────────────────────────────
 export function EmptyHomeHint({ theme }) {
   return (
     <div style={{
@@ -257,4 +324,22 @@ export function EmptyHomeHint({ theme }) {
       </div>
     </div>
   );
+}
+
+// ─── Стиль баннера ────────────────────────────────────────────────────────────
+function bannerStyle(theme) {
+  return {
+    position: "fixed", bottom: 20, left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 30,
+    background: theme.panelBg,
+    border: `1px solid ${theme.surfaceBorder}`,
+    borderRadius: 16,
+    padding: "14px 18px",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+    display: "flex", alignItems: "center", gap: 12,
+    maxWidth: 380, width: "calc(100vw - 32px)",
+    animation: "overlaySlideUp .25s ease",
+    boxSizing: "border-box",
+  };
 }

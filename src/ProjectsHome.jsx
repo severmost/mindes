@@ -145,7 +145,7 @@ function ProjectsOverview({ maps, theme, onOpenMap }) {
 }
 
 // ── Project card ──
-function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesktop }) {
+function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesktop, isFirst }) {
   const resolvedIdx = (map.tree?.colorIdx !== undefined && map.tree?.colorIdx !== null)
     ? map.tree.colorIdx : fallbackIdx;
   const c = COLORS[resolvedIdx % COLORS.length];
@@ -185,6 +185,7 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
 
   return (
     <div
+      data-ob={isFirst ? "project-card" : undefined}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
@@ -252,6 +253,7 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
 function AddCard({ theme, onClick }) {
   return (
     <div
+      data-ob="add-card"
       onClick={onClick}
       style={{
         borderRadius: 14,
@@ -601,6 +603,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 colorIdx={idx}
                 theme={theme}
                 isDesktop={isDesktop}
+                isFirst={idx === 0}
                 onOpen={() => { onOpenMap(map.id); onboarding?.completeStep("open-project"); }}
                 onEdit={() => setEditing({
                   id: map.id,

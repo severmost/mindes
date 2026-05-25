@@ -112,7 +112,7 @@ function BranchStats({ node, theme, onAdd }) {
       )}
 
       {/* Add button */}
-      <button onClick={onAdd} style={{
+      <button data-ob="add-button" onClick={onAdd} style={{
         marginTop: "auto", padding: "10px", borderRadius: 10,
         border: `1.5px dashed ${theme.surfaceBorder}`, background: "transparent",
         color: theme.textMuted, fontFamily: "'Inter'", fontWeight: 600, fontSize: 13,
@@ -960,11 +960,13 @@ export default function Mindmap({
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 80px" }}>
 
           {/* Center card */}
-          <NodeCard node={navNode} colorIdx={centerColorIdx} level={0}
-            onNavigate={undefined}
-            onEdit={() => { setSelectedId(navNodeId); onboarding?.completeStep("select-node"); onboarding?.completeStep("edit-node"); }}
-            theme={theme}
-            singleTapEdit />
+          <div data-ob="center-node">
+            <NodeCard node={navNode} colorIdx={centerColorIdx} level={0}
+              onNavigate={undefined}
+              onEdit={() => { setSelectedId(navNodeId); onboarding?.completeStep("select-node"); }}
+              theme={theme}
+              singleTapEdit />
+          </div>
 
           {/* Chevron row */}
           {visChildren.length > 0 && (
@@ -979,21 +981,23 @@ export default function Mindmap({
           {visChildren.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${numCols}, 1fr)`, columnGap: 12, rowGap: 28, marginTop: 4 }}>
               {visChildren.map((child, i) => (
-                <ChildColumn key={child.id}
-                  child={child} childIdx={i}
-                  onNavigate={navigateInto}
-                  onNavigateGc={navigateIntoGc}
-                  onEdit={id => { setSelectedId(id); onboarding?.completeStep("select-node"); onboarding?.completeStep("edit-node"); }}
-                  theme={theme}
-                  newTaskIds={newTaskIds}
-                  onArchive={handleArchive}
-                  onDone={handleDone} />
+                <div key={child.id} data-ob={i === 0 ? "child-node" : undefined}>
+                  <ChildColumn
+                    child={child} childIdx={i}
+                    onNavigate={id => { navigateInto(id); onboarding?.completeStep("navigate-into"); }}
+                    onNavigateGc={(pid, gcId) => { navigateIntoGc(pid, gcId); onboarding?.completeStep("navigate-into"); }}
+                    onEdit={id => { setSelectedId(id); onboarding?.completeStep("edit-node"); }}
+                    theme={theme}
+                    newTaskIds={newTaskIds}
+                    onArchive={handleArchive}
+                    onDone={handleDone} />
+                </div>
               ))}
             </div>
           )}
 
           {/* Кнопка добавить — только на мобиле (на десктопе — в панели статистики) */}
-          {isMobile && <button onClick={() => handleAdd(navNodeId)} style={{
+          {isMobile && <button data-ob="add-button" onClick={() => handleAdd(navNodeId)} style={{
             marginTop: 16, width: "100%", padding: "11px", borderRadius: 12,
             border: `1.5px dashed ${theme.surfaceBorder}`, background: "transparent",
             color: theme.textMuted, fontFamily: "'Inter'", fontWeight: 600, fontSize: 13,
