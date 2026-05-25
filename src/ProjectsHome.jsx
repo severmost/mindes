@@ -479,28 +479,49 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
   };
 
   // Back button / swipe-back для модалок
-  const prevEditingRef = useRef(null);
-  const prevOverlayRef = useRef(null);
+  // Правило: pushState → при программном закрытии вызываем history.back(),
+  // а не обнуляем стейт напрямую. Иначе запись висит и сдвигает историю.
+  const prevEditingRef     = useRef(null);
+  const prevOverlayRef     = useRef(null);
+  const editModalPushed    = useRef(false);
+  const overlayModalPushed = useRef(false);
+
   useEffect(() => {
-    if (editing && !prevEditingRef.current)
+    if (editing && !prevEditingRef.current) {
       history.pushState({ modal: "edit" }, "", window.location.href);
+      editModalPushed.current = true;
+    }
     prevEditingRef.current = editing;
   }, [editing]);
   useEffect(() => {
-    if (overlayMode && !prevOverlayRef.current)
+    if (overlayMode && !prevOverlayRef.current) {
       history.pushState({ modal: "overlay" }, "", window.location.href);
+      overlayModalPushed.current = true;
+    }
     prevOverlayRef.current = overlayMode;
   }, [overlayMode]);
   useEffect(() => {
     const myPath = window.location.pathname;
     const handler = () => {
       if (window.location.pathname !== myPath) return;
+      editModalPushed.current    = false;
+      overlayModalPushed.current = false;
       if (overlayMode) setOverlayMode(null);
       else if (editing) setEditing(null);
     };
     window.addEventListener("popstate", handler);
     return () => window.removeEventListener("popstate", handler);
   }, [overlayMode, editing]);
+
+  const closeEditing = useCallback(() => {
+    if (editModalPushed.current) { editModalPushed.current = false; history.back(); }
+    else setEditing(null);
+  }, []);
+
+  const closeOverlay = useCallback(() => {
+    if (overlayModalPushed.current) { overlayModalPushed.current = false; history.back(); }
+    else { setOverlayMode(null); onOverlayClose?.(); }
+  }, [onOverlayClose]);
 
   const isDesktop = winW >= 720;
 
@@ -528,10 +549,6 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
     </div>
   );
 
-  const closeOverlay = () => {
-    setOverlayMode(null);
-    onOverlayClose?.();
-  };
 
   return (
     <div
@@ -636,10 +653,10 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
               priority: fields.priority,
               colorIdx: fields.colorIdx,
             }));
-            setEditing(null);
+            closeEditing();
           }}
-          onDelete={() => { onDeleteMap(editing.id); setEditing(null); }}
-          onClose={() => setEditing(null)}
+          onDelete={() => { onDeleteMap(editing.id); closeEditing(); }}
+          onClose={closeEditing}
         />
       )}
 
@@ -661,7 +678,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 const co = COLORS[(task.colorIdx ?? 0) % COLORS.length];
                 const dl = formatDeadline(task.deadline);
                 return (
-                  <div key={`${task.mapId}/${task.id}`} onClick={() => { onNavigateTask?.(task.mapId, task.id); setOverlayMode(null); }}
+                  <div key={`${task.mapId}/${task.id}`} onClick={() => { onNavigateTask?.(task.mapId, task.id); closeOverlay(); }}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 4, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, borderRadius: 10, cursor: "pointer" }}
                     onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
                     onMouseLeave={e => e.currentTarget.style.background = theme.surfaceBg}>
@@ -719,7 +736,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                         const dl = task.deadline ? fmtDeadline(new Date(task.deadline)) : null;
                         return (
                           <div key={`${task.mapId}/${task.id}`}
-                            onClick={() => { onNavigateTask?.(task.mapId, task.id); setOverlayMode(null); }}
+                            onClick={() => { onNavigateTask?.(task.mapId, task.id); closeOverlay(); }}
                             style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 4, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, borderRadius: 10, cursor: "pointer" }}
                             onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
                             onMouseLeave={e => e.currentTarget.style.background = theme.surfaceBg}>

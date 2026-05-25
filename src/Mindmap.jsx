@@ -697,36 +697,69 @@ export default function Mindmap({
   const lastSyncedTaskIdRef = useRef(undefined);
   const pendingSelectRef    = useRef(null);
 
-  useEffect(() => {
-    const onKey = e => { if (e.key === "Escape") setSelectedId(null); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
   // Back button / swipe-back support для модалок (не для страничной навигации)
-  const prevSelectedRef = useRef(null);
-  const prevOverlayRef  = useRef(null);
+  //
+  // Правило: если сделали pushState при открытии — при программном закрытии
+  // обязаны вызвать history.back(), а не напрямую обнулять стейт.
+  // Иначе pushState-запись остаётся «висеть» и сдвигает историю на 1.
+  const prevSelectedRef    = useRef(null);
+  const prevOverlayRef     = useRef(null);
+  const sideModalPushed    = useRef(false);
+  const overlayModalPushed = useRef(false);
+
   useEffect(() => {
-    if (selectedId && !prevSelectedRef.current)
+    if (selectedId && !prevSelectedRef.current) {
       history.pushState({ modal: "side" }, "", window.location.href);
+      sideModalPushed.current = true;
+    }
     prevSelectedRef.current = selectedId;
   }, [selectedId]);
+
   useEffect(() => {
-    if (overlayMode && !prevOverlayRef.current)
+    if (overlayMode && !prevOverlayRef.current) {
       history.pushState({ modal: "overlay" }, "", window.location.href);
+      overlayModalPushed.current = true;
+    }
     prevOverlayRef.current = overlayMode;
   }, [overlayMode]);
+
   useEffect(() => {
     const myPath = window.location.pathname;
     const handler = () => {
       // Если URL изменился — это страничная навигация, пусть роутер обработает
       if (window.location.pathname !== myPath) return;
+      // Сбрасываем флаги: pushState-запись потреблена через popstate
+      sideModalPushed.current    = false;
+      overlayModalPushed.current = false;
       if (overlayMode) setOverlayMode(null);
       else if (selectedId) setSelectedId(null);
     };
     window.addEventListener("popstate", handler);
     return () => window.removeEventListener("popstate", handler);
   }, [overlayMode, selectedId]);
+
+  // Escape — тоже потребляет запись, если она была
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key !== "Escape") return;
+      if (sideModalPushed.current) { sideModalPushed.current = false; history.back(); }
+      else setSelectedId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Закрыть SidePanel: потребляем pushState если был, иначе — напрямую
+  const closeSidePanel = useCallback(() => {
+    if (sideModalPushed.current) { sideModalPushed.current = false; history.back(); }
+    else setSelectedId(null);
+  }, []);
+
+  // Закрыть overlay: потребляем pushState если был, иначе — напрямую
+  const closeOverlay = useCallback(() => {
+    if (overlayModalPushed.current) { overlayModalPushed.current = false; history.back(); }
+    else setOverlayMode(null);
+  }, []);
 
   const isMobile  = winW < 720;
   const activeMap = maps.find(m => m.id === activeMapId) || maps[0];
@@ -986,7 +1019,7 @@ export default function Mindmap({
       {/* Edit sheet modal — same for mobile and desktop */}
       {selectedId && editNode && (
         <SidePanel node={editNode} tree={tree} setTree={setTree}
-          onClose={() => setSelectedId(null)}
+          onClose={closeSidePanel}
           onDelete={handleDelete}
           theme={theme} isMobile={isMobile} />
       )}
@@ -1025,7 +1058,7 @@ export default function Mindmap({
           </div>
         );
         return (
-          <AppOverlay title="Сегодня" theme={theme} onClose={() => setOverlayMode(null)}>
+          <AppOverlay title="Сегодня" theme={theme} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
               : <><Section title="Просрочено" list={overdue} /><Section title="Сегодня" list={today} /><Section title="На неделе" list={week} /></>}
@@ -1037,7 +1070,7 @@ export default function Mindmap({
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <AppOverlay title="Архив" theme={theme} onClose={() => setOverlayMode(null)}>
+          <AppOverlay title="Архив" theme={theme} onClose={closeOverlay}>
             {items.length === 0
               ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
               : items.map(t => {
