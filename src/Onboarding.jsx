@@ -15,10 +15,17 @@ export const STEPS = [
     target: "[data-ob='add-card']",
   },
   {
+    id:     "edit-project",
+    emoji:  "✏️",
+    title:  "Двойной клик или долгий тап",
+    sub:    "На карточке проекта — для редактирования",
+    target: "[data-ob='project-card']",
+  },
+  {
     id:     "open-project",
     emoji:  "👆",
     title:  "Откройте проект",
-    sub:    "Нажмите на карточку проекта",
+    sub:    "Одиночный клик / тап на карточке",
     target: "[data-ob='project-card']",
   },
   {

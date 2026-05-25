@@ -605,15 +605,18 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                 isDesktop={isDesktop}
                 isFirst={idx === 0}
                 onOpen={() => { onOpenMap(map.id); onboarding?.completeStep("open-project"); }}
-                onEdit={() => setEditing({
-                  id: map.id,
-                  name: map.name,
-                  description: map.tree?.description || "",
-                  deadline: map.tree?.deadline || null,
-                  priority: map.tree?.priority || null,
-                  colorIdx: (map.tree?.colorIdx !== undefined && map.tree?.colorIdx !== null)
-                    ? map.tree.colorIdx : idx,
-                })}
+                onEdit={() => {
+                  onboarding?.completeStep("edit-project");
+                  setEditing({
+                    id: map.id,
+                    name: map.name,
+                    description: map.tree?.description || "",
+                    deadline: map.tree?.deadline || null,
+                    priority: map.tree?.priority || null,
+                    colorIdx: (map.tree?.colorIdx !== undefined && map.tree?.colorIdx !== null)
+                      ? map.tree.colorIdx : idx,
+                  });
+                }}
               />
             ))}
             <AddCard theme={theme} onClick={() => { onAddMap(); onboarding?.completeStep("create-project"); }} />
