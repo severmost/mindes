@@ -389,7 +389,8 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
         {/* Название */}
         <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.name")}</label>
-        <input value={name} onChange={e => setName(e.target.value)} autoFocus style={inp}
+        <input value={name} onChange={e => setName(e.target.value)}
+          onCompositionEnd={e => setName(e.target.value)} autoFocus style={inp}
           onKeyDown={e => e.key === "Enter" && handleSave()} />
 
         {/* Цвет */}
@@ -412,7 +413,8 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
         {/* Описание */}
         <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.description")}</label>
-        <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} style={{
+        <textarea value={desc} onChange={e => setDesc(e.target.value)}
+          onCompositionEnd={e => setDesc(e.target.value)} rows={3} style={{
           ...inp, resize: "vertical", lineHeight: 1.5,
         }} />
 

@@ -285,6 +285,11 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
             e.target.style.height = "auto";
             e.target.style.height = e.target.scrollHeight + "px";
           }}
+          onCompositionEnd={e => {
+            setTitle(e.target.value);
+            e.target.style.height = "auto";
+            e.target.style.height = e.target.scrollHeight + "px";
+          }}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (title.trim()) { save("text", title.trim()); e.target.blur(); } } }}
           rows={1}
           ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
@@ -421,6 +426,11 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
           <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>{t("common.description")}</div>
           <textarea className="pi" value={desc}
             onChange={e => {
+              setDesc(e.target.value);
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
+            onCompositionEnd={e => {
               setDesc(e.target.value);
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
