@@ -4,57 +4,58 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { glassStyle } from "./ui";
+import { useLocale } from "./i18n.jsx";
 
 // ─── Шаги ────────────────────────────────────────────────────────────────────
 export const STEPS = [
   {
-    id:     "create-project",
-    emoji:  "📁",
-    title:  "Создайте первый проект",
-    sub:    "Нажмите на карточку «+»",
-    target: "[data-ob='add-card']",
+    id:       "create-project",
+    emoji:    "📁",
+    titleKey: "onboarding.s1title",
+    subKey:   "onboarding.s1sub",
+    target:   "[data-ob='add-card']",
   },
   {
-    id:     "edit-project",
-    emoji:  "✏️",
-    title:  "Двойной клик или долгий тап",
-    sub:    "На карточке проекта — для редактирования",
-    target: "[data-ob='project-card']",
+    id:       "edit-project",
+    emoji:    "✏️",
+    titleKey: "onboarding.s2title",
+    subKey:   "onboarding.s2sub",
+    target:   "[data-ob='project-card']",
   },
   {
-    id:     "open-project",
-    emoji:  "👆",
-    title:  "Откройте проект",
-    sub:    "Одиночный клик / тап на карточке",
-    target: "[data-ob='project-card']",
+    id:       "open-project",
+    emoji:    "👆",
+    titleKey: "onboarding.s3title",
+    subKey:   "onboarding.s3sub",
+    target:   "[data-ob='project-card']",
   },
   {
-    id:     "select-node",
-    emoji:  "🎯",
-    title:  "Нажмите на узел",
-    sub:    "Откроется окно с деталями задачи",
-    target: "[data-ob='center-node']",
+    id:       "select-node",
+    emoji:    "🎯",
+    titleKey: "onboarding.s4title",
+    subKey:   "onboarding.s4sub",
+    target:   "[data-ob='center-node']",
   },
   {
-    id:     "add-child",
-    emoji:  "➕",
-    title:  "Добавьте подзадачу",
-    sub:    "Нажмите «+ Добавить задачу»",
-    target: "[data-ob='add-button']",
+    id:       "add-child",
+    emoji:    "➕",
+    titleKey: "onboarding.s5title",
+    subKey:   "onboarding.s5sub",
+    target:   "[data-ob='add-button']",
   },
   {
-    id:     "edit-node",
-    emoji:  "✏️",
-    title:  "Двойной клик или долгий тап",
-    sub:    "На дочернем узле — откроется редактирование",
-    target: "[data-ob='child-node']",
+    id:       "edit-node",
+    emoji:    "✏️",
+    titleKey: "onboarding.s6title",
+    subKey:   "onboarding.s6sub",
+    target:   "[data-ob='child-node']",
   },
   {
-    id:     "navigate-into",
-    emoji:  "🔍",
-    title:  "Провалитесь глубже",
-    sub:    "Один клик / тап на дочернем узле — переход на его уровень",
-    target: "[data-ob='child-node']",
+    id:       "navigate-into",
+    emoji:    "🔍",
+    titleKey: "onboarding.s7title",
+    subKey:   "onboarding.s7sub",
+    target:   "[data-ob='child-node']",
   },
 ];
 
@@ -194,6 +195,7 @@ function ArrowSvg({ pts }) {
 
 // ─── Баннер ──────────────────────────────────────────────────────────────────
 export function OnboardingBanner({ onboarding, theme }) {
+  const { t } = useLocale();
   const { isActive, currentStep, state, skip } = onboarding;
   const [justFinished, setJustFinished] = useState(false);
   const prevDone    = useRef(state.done);
@@ -268,8 +270,8 @@ export function OnboardingBanner({ onboarding, theme }) {
       <div style={bannerStyle(theme)}>
         <span style={{ fontSize: 22 }}>🎉</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>Отлично! Обучение пройдено</div>
-          <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>Вернуться можно через меню → Обучение</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>{t("onboarding.doneTitle")}</div>
+          <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>{t("onboarding.doneHint")}</div>
         </div>
       </div>
     );
@@ -311,14 +313,14 @@ export function OnboardingBanner({ onboarding, theme }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>
-              {currentStep.title}
+              {t(currentStep.titleKey)}
             </span>
             <span style={{ fontSize: 11, color: theme.textMuted, flexShrink: 0 }}>
               {stepIdx + 1} / {total}
             </span>
           </div>
           <div style={{ fontSize: 12, color: theme.textMuted, lineHeight: 1.4 }}>
-            {currentStep.sub}
+            {t(currentStep.subKey)}
           </div>
         </div>
 
@@ -329,7 +331,7 @@ export function OnboardingBanner({ onboarding, theme }) {
           textDecoration: "underline", textUnderlineOffset: 2,
           zIndex: 1, position: "relative",
         }}>
-          Пропустить
+          {t("onboarding.skip")}
         </button>
       </div>
     </>
@@ -338,6 +340,7 @@ export function OnboardingBanner({ onboarding, theme }) {
 
 // ─── Пустой экран ─────────────────────────────────────────────────────────────
 export function EmptyHomeHint({ theme }) {
+  const { t } = useLocale();
   return (
     <div style={{
       display: "flex", flexDirection: "column", alignItems: "center",
@@ -351,9 +354,9 @@ export function EmptyHomeHint({ theme }) {
         <line x1="25" y1="37" x2="39" y2="37" stroke={theme.text} strokeWidth="2.5" strokeLinecap="round"/>
       </svg>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 5 }}>Нет проектов</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 5 }}>{t("empty.title")}</div>
         <div style={{ fontSize: 13, color: theme.textMuted, maxWidth: 240, lineHeight: 1.5 }}>
-          Создайте первый проект, чтобы начать
+          {t("empty.subtitle")}
         </div>
       </div>
     </div>

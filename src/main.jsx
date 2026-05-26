@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./styles.css";
 import App from "./App.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
+import { LocaleProvider } from "./i18n.jsx";
 
 // Service Worker — только для веба (не в Capacitor native)
 if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
@@ -27,8 +28,10 @@ if (window.Capacitor?.isNativePlatform?.()) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
+    <LocaleProvider>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </LocaleProvider>
   </StrictMode>
 );

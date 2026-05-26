@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback, lazy, Suspense } from "react";
+import { useLocale } from "./i18n.jsx";
 import { watchAuth, signOut } from "./auth";
 import { useFirestoreSync } from "./sync";
 import { useTheme, useNodeShape } from "./theme";
@@ -53,6 +54,7 @@ export default function App() {
   const { theme }                 = themeApi;
   const [showBgPanel, setShowBgPanel] = useState(false);
   const onboarding = useOnboarding();
+  const { t }   = useLocale();
   const winW     = useWindowWidth();
   const isMobile = winW < 768;
 
@@ -152,9 +154,9 @@ export default function App() {
     }}>{label}</div>
   );
 
-  if (!authReady)   return splash("Загрузка…");
+  if (!authReady)   return splash(t("app.loading"));
   if (!user)        return <><Login theme={theme} themeName={themeApi.name} onToggleTheme={themeApi.toggle} /><InstallPrompt theme={theme} /></>;
-  if (sync.loading) return splash("Синхронизация…");
+  if (sync.loading) return splash(t("app.syncing"));
 
   if (show404) { history.replaceState({}, "", "/notfound"); return <NotFound theme={theme} onGoHome={goHome} />; }
   if (is404)   return <NotFound theme={theme} onGoHome={goHome} />;
@@ -183,7 +185,7 @@ export default function App() {
   if (showMindmap) {
     const activeId = sync.activeMapId || routePid;
     return (
-      <Suspense fallback={splash("Загрузка…")}>
+      <Suspense fallback={splash(t("app.loading"))}>
         {bgLayer}
         <Mindmap
           user={user}
@@ -210,7 +212,7 @@ export default function App() {
 
   // ── Home / Archive / Immediate view ──
   return (
-    <Suspense fallback={splash("Загрузка…")}>
+    <Suspense fallback={splash(t("app.loading"))}>
       {bgLayer}
       <ProjectsHome
         maps={sync.maps}

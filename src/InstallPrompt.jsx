@@ -5,10 +5,12 @@
 // — Запоминает отклонение в localStorage
 
 import { useState, useEffect } from "react";
+import { useLocale } from "./i18n.jsx";
 
 const STORAGE_KEY = "mindes_install_dismissed";
 
 export default function InstallPrompt({ theme }) {
+  const { t } = useLocale();
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState(null);          // "ios" | "chrome"
   const [deferredEvt, setDeferredEvt] = useState(null);
@@ -82,7 +84,7 @@ export default function InstallPrompt({ theme }) {
         }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 15, color: theme.text, marginBottom: 3 }}>
-            Установить Mindes
+            {t("install.title")}
           </div>
           {mode === "ios" ? (
             <div style={{ fontSize: 13, color: theme.textDim, lineHeight: 1.5 }}>
@@ -90,11 +92,11 @@ export default function InstallPrompt({ theme }) {
               <span style={{ fontWeight: 600, color: theme.text }}>
                 Поделиться <ShareIcon />
               </span>{" "}
-              → <span style={{ fontWeight: 600, color: theme.text }}>На экран «Домой»</span>
+              → <span style={{ fontWeight: 600, color: theme.text }}>{t("install.iosHint")}</span>
             </div>
           ) : (
             <div style={{ fontSize: 13, color: theme.textDim, lineHeight: 1.5 }}>
-              Добавьте на рабочий стол для быстрого доступа
+              {t("install.chromeHint")}
             </div>
           )}
         </div>
@@ -105,7 +107,7 @@ export default function InstallPrompt({ theme }) {
             background: "#5b3fc4", color: "#fff",
             fontFamily: "'Inter'", fontWeight: 700, fontSize: 13,
             cursor: "pointer", whiteSpace: "nowrap",
-          }}>Установить</button>
+          }}>{t("install.button")}</button>
         )}
         <button onClick={dismiss} style={{
           flexShrink: 0, background: "none", border: "none",

@@ -3,8 +3,10 @@
 
 import { useState } from "react";
 import { saveBgUrl, clearBg } from "./background";
+import { useLocale } from "./i18n.jsx";
 
 export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }) {
+  const { t } = useLocale();
   const [urlInput,  setUrlInput]  = useState(bgUrl || "");
   const [saving,    setSaving]    = useState(false);
   const [error,     setError]     = useState(null);
@@ -13,7 +15,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
     setError(null);
     setSaving(true);
     try { await fn(); onClose(); }
-    catch (e) { setError(e.message || "Ошибка"); }
+    catch (e) { setError(e.message || t("common.error")); }
     finally   { setSaving(false); }
   };
 
@@ -62,7 +64,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
         )}
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "14px 20px 10px" : "18px 22px 10px" }}>
-          <span style={{ fontSize: 17, fontWeight: 700, color: theme.text }}>Фон приложения</span>
+          <span style={{ fontSize: 17, fontWeight: 700, color: theme.text }}>{t("bg.title")}</span>
           {!isMobile && (
             <button onClick={onClose} style={{ background: "none", border: "none", color: theme.textMuted, fontSize: 24, cursor: "pointer", lineHeight: 1, padding: "0 4px" }}>×</button>
           )}
@@ -86,7 +88,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
                 background: "rgba(0,0,0,0.45)", borderRadius: 6,
                 padding: "2px 7px",
               }}>
-                🔗 Текущий фон
+                {t("bg.current")}
               </div>
             </div>
           )}
@@ -94,11 +96,11 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
           {/* URL */}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <label style={{ fontSize: 12, color: theme.textMuted, fontWeight: 500, letterSpacing: "0.03em" }}>
-              ССЫЛКА НА ИЗОБРАЖЕНИЕ
+              {t("bg.linkLabel")}
             </label>
             <input
               type="url"
-              placeholder="https://example.com/photo.jpg"
+              placeholder={t("bg.placeholder")}
               value={urlInput}
               onChange={e => setUrlInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleApply()}
@@ -122,7 +124,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
                 transition: "opacity .15s",
               }}
             >
-              {saving ? "Сохранение…" : "Применить"}
+              {saving ? t("bg.saving") : t("bg.apply")}
             </button>
           </div>
 
@@ -152,7 +154,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
                   opacity: saving ? 0.5 : 1,
                 }}
               >
-                Убрать фон
+                {t("bg.remove")}
               </button>
             </>
           )}

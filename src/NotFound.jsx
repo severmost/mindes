@@ -1,4 +1,7 @@
+import { useLocale } from "./i18n.jsx";
+
 export default function NotFound({ theme, onGoHome }) {
+  const { t } = useLocale();
   return (
     <div style={{
       width: "100%", height: "100vh",
@@ -16,10 +19,10 @@ export default function NotFound({ theme, onGoHome }) {
         404
       </div>
       <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, marginTop: 4 }}>
-        Страница не найдена
+        {t("notfound.title")}
       </div>
       <div style={{ fontSize: 14, color: theme.textMuted, textAlign: "center", maxWidth: 280 }}>
-        Возможно, ссылка устарела или такой страницы никогда не существовало
+        {t("notfound.subtitle")}
       </div>
       <button
         onClick={onGoHome}
@@ -39,7 +42,7 @@ export default function NotFound({ theme, onGoHome }) {
         onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
         onMouseLeave={e => e.currentTarget.style.opacity = "1"}
       >
-        На главную
+        {t("notfound.goHome")}
       </button>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signInWithGoogle } from "./auth";
 import { themes } from "./theme";
+import { useLocale } from "./i18n.jsx";
 
 /* ── палитра карточек-превью ── */
 const CARD_COLORS = {
@@ -59,13 +60,7 @@ const SHOWCASE_CARDS = [
   },
 ];
 
-/* ── список фич ── */
-const FEATURES = [
-  { color: CARD_COLORS.purple, text: "Чёткая иерархия — вся структура целей видна одним взглядом" },
-  { color: CARD_COLORS.orange, text: "Цветовое кодирование — проекты различаются с расстояния" },
-  { color: CARD_COLORS.blue,   text: "Просрочено / сегодня / неделя — без меню и фильтров" },
-  { color: CARD_COLORS.green,  text: "Синхронизация через ваш Google-аккаунт" },
-];
+/* ── список фич (строится внутри компонента через t()) ── */
 
 /* ── Google logo SVG ── */
 function GoogleLogo() {
@@ -98,9 +93,17 @@ function SunIcon() {
 
 /* ════════════════════════════════════════════════════════════════ */
 export default function Login({ theme = themes.dark, themeName, onToggleTheme }) {
+  const { t } = useLocale();
   const [busy, setBusy]   = useState(false);
   const [error, setError] = useState(null);
   const isDark = theme.name === "dark";
+
+  const FEATURES = [
+    { color: CARD_COLORS.purple, text: t("login.f1") },
+    { color: CARD_COLORS.orange, text: t("login.f2") },
+    { color: CARD_COLORS.blue,   text: t("login.f3") },
+    { color: CARD_COLORS.green,  text: t("login.f4") },
+  ];
 
   /* ── цвета, зависящие от темы ── */
   const T = isDark ? {
@@ -323,14 +326,13 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
             </div>
 
             {/* Title */}
-            <h1 className="login-title" style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.0, margin: "0 0 16px", color: T.ink }}>
-              Все ваши мысли<br/>
-              на <span style={{ color: T.accentTitle }}>одном экране</span>.
+            <h1 className="login-title" style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.0, margin: "0 0 16px", color: T.ink, whiteSpace: "pre-line" }}>
+              {t("login.headline")}
             </h1>
 
             {/* Subtitle */}
             <p style={{ fontSize: 15, lineHeight: 1.5, color: T.ink2, margin: "0 0 28px" }}>
-              Визуальный планировщик задач: чёткая иерархия, цвет вместо тегов, синхронизация между всеми устройствами.
+              {t("login.sub")}
             </p>
 
             {/* Feature list */}
@@ -365,7 +367,7 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
               onMouseDown={e => { if (!busy) e.currentTarget.style.transform = "translateY(0)"; }}
             >
               <GoogleLogo />
-              {busy ? "Входим…" : "Войти через Google"}
+              {busy ? t("login.signingIn") : t("login.signIn")}
             </button>
 
             {/* Error */}
@@ -378,15 +380,15 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
             )}
 
             {/* Footnote */}
-            <p style={{ fontSize: 12, color: T.ink3, textAlign: "center", margin: "16px 0 0", lineHeight: 1.45 }}>
-              Ваши задачи сохраняются в вашем Google-аккаунте<br/>и синхронизируются между устройствами.
+            <p style={{ fontSize: 12, color: T.ink3, textAlign: "center", margin: "16px 0 0", lineHeight: 1.45, whiteSpace: "pre-line" }}>
+              {t("login.footnote")}
             </p>
 
             {/* Privacy policy link */}
             <p style={{ fontSize: 11, color: T.ink3, textAlign: "center", margin: "10px 0 0" }}>
               <a href="/privacy.html" target="_blank" rel="noopener noreferrer"
                 style={{ color: T.ink3, textDecoration: "underline", textUnderlineOffset: 2 }}>
-                Политика конфиденциальности
+                {t("login.privacy")}
               </a>
             </p>
           </div>
@@ -420,7 +422,7 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
           onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 14px -6px rgba(0,0,0,0.18)"; }}
         >
           {isDark ? <SunIcon /> : <MoonIcon />}
-          <span>{isDark ? "Светлая тема" : "Тёмная тема"}</span>
+          <span>{isDark ? t("menu.lightTheme") : t("menu.darkTheme")}</span>
         </button>
       )}
     </div>

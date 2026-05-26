@@ -3,6 +3,7 @@
 
 import { useState, useRef } from "react";
 import BrandLogo from "./BrandLogo";
+import { useLocale, LANGS } from "./i18n.jsx";
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 export function SunIcon({ size = 16 }) {
@@ -91,12 +92,15 @@ export function AppOverlay({ title, children, theme, themeName, onClose, zIndex 
 // Pass user to show the email header at the top.
 export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
   onToday, onArchive, onOpenBgPanel, onOnboarding, onClose, user }) {
+  const { t, locale, setLocale } = useLocale();
+  const [langOpen, setLangOpen] = useState(false);
+
   return (
     <div
       style={{
         position: "absolute", top: 50, right: 0, zIndex: 40,
         ...glassStyle(themeName),
-        borderRadius: 14, padding: "8px 0", minWidth: 190,
+        borderRadius: 14, padding: "8px 0", minWidth: 210,
         animation: "menuIn .18s ease",
       }}
       onClick={e => e.stopPropagation()}
@@ -111,10 +115,41 @@ export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
           {user.email}
         </div>
       )}
-      <div className="menu-item" onClick={() => { onToday?.();       onClose(); }}>Сегодня</div>
-      <div className="menu-item" onClick={() => { onArchive?.();     onClose(); }}>Архив</div>
-      <div className="menu-item" onClick={() => { onOpenBgPanel?.(); onClose(); }}>Фон</div>
-      <div className="menu-item" onClick={() => { onOnboarding?.();  onClose(); }}>Обучение</div>
+      <div className="menu-item" onClick={() => { onToday?.();       onClose(); }}>{t("menu.today")}</div>
+      <div className="menu-item" onClick={() => { onArchive?.();     onClose(); }}>{t("menu.archive")}</div>
+      <div className="menu-item" onClick={() => { onOpenBgPanel?.(); onClose(); }}>{t("menu.background")}</div>
+      <div className="menu-item" onClick={() => { onOnboarding?.();  onClose(); }}>{t("menu.training")}</div>
+
+      {/* Language selector */}
+      <div className="menu-item"
+        onClick={() => setLangOpen(o => !o)}
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span>{t("menu.language")}</span>
+        <span style={{ fontSize: 13, color: theme.textMuted }}>
+          {LANGS[locale]?.flag} {LANGS[locale]?.name}
+        </span>
+      </div>
+      {langOpen && (
+        <div style={{ paddingLeft: 16, paddingBottom: 4 }}>
+          {Object.entries(LANGS).map(([code, info]) => (
+            <div key={code}
+              onClick={() => { setLocale(code); setLangOpen(false); onClose(); }}
+              style={{
+                padding: "7px 16px 7px 0",
+                fontSize: 13,
+                cursor: "pointer",
+                color: code === locale ? "#7c5fe6" : theme.text,
+                fontWeight: code === locale ? 700 : 400,
+                display: "flex", alignItems: "center", gap: 8,
+              }}
+              className="menu-item-inner">
+              <span>{info.flag}</span>
+              <span>{info.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
       <div className="menu-item"
         onClick={() => { onToggleTheme(); onClose(); }}
@@ -122,13 +157,13 @@ export function AppMenu({ theme, themeName, onToggleTheme, onSignOut,
         <span style={{ display: "inline-flex", color: theme.btnText }}>
           {themeName === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}
         </span>
-        {themeName === "dark" ? "Светлая тема" : "Тёмная тема"}
+        {themeName === "dark" ? t("menu.lightTheme") : t("menu.darkTheme")}
       </div>
       <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "4px 0" }} />
       <div className="menu-item-danger"
         onClick={() => { onSignOut(); onClose(); }}
         style={{ color: "#F44336" }}>
-        Выйти
+        {t("menu.signOut")}
       </div>
     </div>
   );

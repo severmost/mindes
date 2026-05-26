@@ -8,6 +8,7 @@ import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay, glassStyle } from "./ui";
 import { boostTheme } from "./theme";
 import { OnboardingBanner, obWrongStep } from "./Onboarding";
+import { useLocale } from "./i18n.jsx";
 import {
   COLORS, PRIORITY_COLORS, genId,
   toLocalInput, fromLocalInput, formatDeadline,
@@ -34,6 +35,7 @@ function ColorPicker({ currentIdx, onChange, onClose, theme }) {
 
 // ── Branch Stats (desktop right column) ──
 function BranchStats({ node, theme, onAdd }) {
+  const { t } = useLocale();
   const { total, done, pri, deadlines } = collectBranchStats(node);
   const pct = total ? Math.round((done / total) * 100) : 0;
   const priTotal = pri.high + pri.medium + pri.low;
@@ -56,7 +58,7 @@ function BranchStats({ node, theme, onAdd }) {
     }}>
       {/* Progress */}
       <div>
-        {label(10, theme.sectionLabel, "Прогресс")}
+        {label(10, theme.sectionLabel, t("branch.progress"))}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
           <span style={{ fontSize: 26, fontWeight: 800, color: theme.text, lineHeight: 1 }}>{pct}%</span>
           <span style={{ fontSize: 12, color: theme.textMuted }}>{done} / {total}</span>
@@ -69,16 +71,16 @@ function BranchStats({ node, theme, onAdd }) {
       {/* Priorities */}
       {priTotal > 0 && (
         <div>
-          {label(10, theme.sectionLabel, "Приоритеты")}
+          {label(10, theme.sectionLabel, t("branch.priorities"))}
           <div style={{ height: 6, borderRadius: 3, overflow: "hidden", display: "flex", marginBottom: 10 }}>
             {pri.high   > 0 && <div style={{ width: `${(pri.high   / priTotal) * 100}%`, height: "100%", background: "#F44336" }} />}
             {pri.medium > 0 && <div style={{ width: `${(pri.medium / priTotal) * 100}%`, height: "100%", background: "#FFC107" }} />}
             {pri.low    > 0 && <div style={{ width: `${(pri.low    / priTotal) * 100}%`, height: "100%", background: "#4CAF50" }} />}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {pri.high   > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}><span style={{ color: "#F44336", fontWeight: 600 }}>Высокий</span><span style={{ color: theme.textMuted }}>{pri.high}</span></div>}
-            {pri.medium > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}><span style={{ color: "#FFC107", fontWeight: 600 }}>Средний</span><span style={{ color: theme.textMuted }}>{pri.medium}</span></div>}
-            {pri.low    > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}><span style={{ color: "#4CAF50", fontWeight: 600 }}>Низкий</span><span style={{ color: theme.textMuted }}>{pri.low}</span></div>}
+            {pri.high   > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}><span style={{ color: "#F44336", fontWeight: 600 }}>{t("priority.high")}</span><span style={{ color: theme.textMuted }}>{pri.high}</span></div>}
+            {pri.medium > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}><span style={{ color: "#FFC107", fontWeight: 600 }}>{t("priority.medium")}</span><span style={{ color: theme.textMuted }}>{pri.medium}</span></div>}
+            {pri.low    > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}><span style={{ color: "#4CAF50", fontWeight: 600 }}>{t("priority.low")}</span><span style={{ color: theme.textMuted }}>{pri.low}</span></div>}
           </div>
         </div>
       )}
@@ -86,7 +88,7 @@ function BranchStats({ node, theme, onAdd }) {
       {/* Deadlines */}
       {deadlines.length > 0 && (
         <div>
-          {label(10, theme.sectionLabel, "Сроки")}
+          {label(10, theme.sectionLabel, t("branch.deadlines"))}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {deadlines.map(({ id, text, deadline, time }) => {
               const overdue = deadline < now;
@@ -94,8 +96,8 @@ function BranchStats({ node, theme, onAdd }) {
               const isWeek  = deadline <= weekEnd && !isToday && !overdue;
               const color = overdue ? "#F44336" : isToday ? "#FB8C00" : isWeek ? "#FFC107" : theme.textMuted;
               const pad = n => String(n).padStart(2, "0");
-              const dateLabel = overdue ? "просрочено"
-                : isToday ? `сегодня ${pad(deadline.getHours())}:${pad(deadline.getMinutes())}`
+              const dateLabel = overdue ? t("branch.overdue")
+                : isToday ? `${t("branch.today")} ${pad(deadline.getHours())}:${pad(deadline.getMinutes())}`
                 : `${pad(deadline.getDate())}.${pad(deadline.getMonth()+1)}`;
               return (
                 <div key={id} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
@@ -120,7 +122,7 @@ function BranchStats({ node, theme, onAdd }) {
       }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = theme.textDim; e.currentTarget.style.color = theme.text; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = theme.surfaceBorder; e.currentTarget.style.color = theme.textMuted; }}>
-        + Добавить задачу
+        {t("task.add")}
       </button>
     </div>
   );
@@ -128,6 +130,7 @@ function BranchStats({ node, theme, onAdd }) {
 
 // ── Side Panel ──
 function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, isMobile }) {
+  const { t } = useLocale();
   if (!node) return null;
   const allDone = isAllDone(node);
   const { total, done } = countTasks(node);
@@ -295,15 +298,15 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
 
       <div style={{ padding: "10px 20px", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", flexShrink: 0 }}>
         <button onClick={toggleDone} style={{ padding: "6px 18px", borderRadius: 20, border: `2px solid ${allDone ? "#4CAF50" : branchColor.bg}`, background: allDone ? "#4CAF5018" : "transparent", color: allDone ? "#4CAF50" : branchColor.bg, fontFamily: "'Inter'", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-          {allDone ? "✓ Выполнено" : "Выполнить"}
+          {allDone ? t("task.done") : t("task.complete")}
         </button>
         <div style={{ position: "relative" }}>
           <button onClick={() => setShowColors(!showColors)} style={{ padding: "6px 12px", borderRadius: 20, border: `2px solid ${theme.inputBorder}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "'Inter'", fontWeight: 600, fontSize: 12, color: theme.textDim }}>
-            <div style={{ width: 14, height: 14, borderRadius: 4, background: branchColor.bg }} />Цвет
+            <div style={{ width: 14, height: 14, borderRadius: 4, background: branchColor.bg }} />{t("common.color")}
           </button>
           {showColors && <ColorPicker currentIdx={currentColorIdx} onChange={i => save("colorIdx", i)} onClose={() => setShowColors(false)} theme={theme} />}
         </div>
-        {node.children.length > 0 && <span style={{ fontSize: 12, color: theme.textMuted }}>{done}/{total} подзадач</span>}
+        {node.children.length > 0 && <span style={{ fontSize: 12, color: theme.textMuted }}>{t("task.subtasks", { done, total })}</span>}
       </div>
 
       <div style={{ height: 1, background: theme.surfaceBorderSoft, margin: "0 20px", flexShrink: 0 }} />
@@ -311,14 +314,14 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Priority */}
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>Важность</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>{t("task.importance")}</div>
           <div style={{ display: "flex", gap: 6 }}>
             {Object.entries(PRIORITY_COLORS).map(([key, p]) => {
               const active = node.priority === key;
               return (
                 <button key={key} onClick={() => save("priority", active ? null : key)}
                   style={{ flex: 1, padding: "8px 6px", borderRadius: 8, border: `2px solid ${active ? p.bg : theme.inputBorder}`, background: active ? p.bg + "22" : "transparent", color: active ? p.bg : theme.textDim, fontFamily: "'Inter'", fontWeight: 700, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.bg, flexShrink: 0 }} />{p.label}
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.bg, flexShrink: 0 }} />{t(`priority.${key}`)}
                 </button>
               );
             })}
@@ -327,7 +330,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
 
         {/* Deadline */}
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>Крайний срок</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>{t("task.deadline")}</div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="datetime-local" className="pi"
               value={toLocalInput(deadline)}
@@ -335,7 +338,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
               style={{ flex: 1, colorScheme: theme.name === "dark" ? "dark" : "light" }} />
             {deadline && (
               <button onClick={() => { setDeadline(""); setRemindEnabled(false); setRepeat(null); setTree(t => updateNode(t, node.id, n => ({ ...n, deadline: null, remindBefore: null, repeat: null }))); }}
-                title="Убрать срок" style={{ background: "transparent", border: `1px solid ${theme.inputBorder}`, borderRadius: 8, padding: "8px 10px", color: theme.textDim, cursor: "pointer", fontFamily: "'Inter'", fontSize: 13 }}>×</button>
+                title={t("task.removeDeadline")} style={{ background: "transparent", border: `1px solid ${theme.inputBorder}`, borderRadius: 8, padding: "8px 10px", color: theme.textDim, cursor: "pointer", fontFamily: "'Inter'", fontSize: 13 }}>×</button>
             )}
           </div>
           {deadline && (
@@ -345,14 +348,14 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
                   const on = e.target.checked; setRemindEnabled(on);
                   if (on) { const ok = await ensureNotificationPermission(); if (!ok) { setRemindEnabled(false); return; } save("remindBefore", remindH * 60 + remindM || 30); }
                   else save("remindBefore", null);
-                }} />Напомнить за
+                }} />{t("remind.label")}
               </label>
               {remindEnabled && (
                 <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
                   <input type="number" min="0" max="999" value={Number.isFinite(remindH) ? remindH : ""} onChange={e => { const v = e.target.value; if (v === "") setRemindH(NaN); else setRemindH(Math.max(0, parseInt(v, 10))); }} onBlur={() => { const h = Number.isFinite(remindH) ? remindH : 0; const m = Number.isFinite(remindM) ? remindM : 0; setRemindH(h); save("remindBefore", h * 60 + m || 1); }} className="pi" style={{ width: 72, textAlign: "center" }} />
-                  <span style={{ fontSize: 12, color: theme.textDim }}>ч</span>
+                  <span style={{ fontSize: 12, color: theme.textDim }}>{t("remind.hours")}</span>
                   <input type="number" min="0" max="59" value={Number.isFinite(remindM) ? remindM : ""} onChange={e => { const v = e.target.value; if (v === "") setRemindM(NaN); else setRemindM(Math.max(0, Math.min(59, parseInt(v, 10)))); }} onBlur={() => { const h = Number.isFinite(remindH) ? remindH : 0; const m = Number.isFinite(remindM) ? remindM : 0; setRemindM(m); save("remindBefore", h * 60 + m || 1); }} className="pi" style={{ width: 72, textAlign: "center" }} />
-                  <span style={{ fontSize: 12, color: theme.textDim }}>мин до срока</span>
+                  <span style={{ fontSize: 12, color: theme.textDim }}>{t("remind.minutesBefore")}</span>
                 </div>
               )}
             </div>
@@ -361,14 +364,14 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
 
         {/* Repeat — только если есть срок */}
         {deadline && <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>Повтор</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>{t("repeat.title")}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {[
-              { key: null,      label: "Нет" },
-              { key: "daily",   label: "Ежедневно" },
-              { key: "weekly",  label: "Еженедельно" },
-              { key: "monthly", label: "Ежемесячно" },
-              { key: "custom",  label: "Каждые N дней" },
+              { key: null,      label: t("repeat.none") },
+              { key: "daily",   label: t("repeat.daily") },
+              { key: "weekly",  label: t("repeat.weekly") },
+              { key: "monthly", label: t("repeat.monthly") },
+              { key: "custom",  label: t("repeat.custom") },
             ].map(opt => {
               const active = repeat?.type === opt.key || (opt.key === null && !repeat);
               return (
@@ -391,7 +394,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
           </div>
           {repeat?.type === "custom" && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
-              <span style={{ fontSize: 13, color: theme.textDim }}>Каждые</span>
+              <span style={{ fontSize: 13, color: theme.textDim }}>{t("repeat.every")}</span>
               <input type="number" min="1" max="365" value={repeatEvery}
                 onChange={e => {
                   const v = Math.max(1, parseInt(e.target.value, 10) || 1);
@@ -403,32 +406,32 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
                   save("repeat", val);
                 }}
                 className="pi" style={{ width: 72, textAlign: "center" }} />
-              <span style={{ fontSize: 13, color: theme.textDim }}>дней</span>
+              <span style={{ fontSize: 13, color: theme.textDim }}>{t("repeat.days")}</span>
             </div>
           )}
           {repeat && (
             <div style={{ marginTop: 8, fontSize: 12, color: theme.textMuted }}>
-              При выполнении срок автоматически перенесётся на следующий цикл
+              {t("repeat.cycleHint")}
             </div>
           )}
         </div>}
 
         {/* Description */}
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>Описание</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>{t("common.description")}</div>
           <textarea className="pi" value={desc}
             onChange={e => {
               setDesc(e.target.value);
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
             }}
-            placeholder="Добавить описание…" rows={3}
+            placeholder={t("task.descPlaceholder")} rows={3}
             ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
             style={{ resize: "none", minHeight: 60, overflow: "hidden", lineHeight: 1.4 }} />
           {desc !== (node.description || "") && (
             <button onClick={() => save("description", desc)}
               style={{ marginTop: 6, padding: "7px 16px", borderRadius: 8, border: "none", background: "#22c55e", color: "#fff", fontFamily: "'Inter'", fontWeight: 700, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-              ✓ Сохранить
+              {t("task.saveDesc")}
             </button>
           )}
         </div>
@@ -436,7 +439,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
         {/* Checklist */}
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2, display: "flex", alignItems: "center", gap: 8 }}>
-            Чеклист {cl.length > 0 && <span style={{ fontSize: 11, color: theme.textFaint, fontWeight: 400, textTransform: "none" }}>{cd}/{cl.length}</span>}
+            {t("checklist.title")} {cl.length > 0 && <span style={{ fontSize: 11, color: theme.textFaint, fontWeight: 400, textTransform: "none" }}>{cd}/{cl.length}</span>}
           </div>
           {cl.length > 0 && (
             <div style={{ height: 4, borderRadius: 2, background: theme.progressTrack, marginBottom: 10, overflow: "hidden" }}>
@@ -455,7 +458,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
             ))}
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <input className="pi" value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === "Enter" && addCheck()} placeholder="Новый пункт…" style={{ flex: 1 }} />
+            <input className="pi" value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === "Enter" && addCheck()} placeholder={t("checklist.placeholder")} style={{ flex: 1 }} />
             <button onClick={addCheck} style={{ background: branchColor.bg, border: "none", borderRadius: 8, padding: "0 14px", color: "#fff", fontWeight: 700, fontSize: 18, cursor: "pointer" }}>+</button>
           </div>
         </div>
@@ -464,7 +467,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
       <div style={{ padding: "12px 20px", borderTop: `1px solid ${theme.surfaceBorderSoft}`, flexShrink: 0 }}>
         <button onClick={() => { onDelete(node.id); onClose(); }}
           style={{ width: "100%", padding: 10, borderRadius: 8, border: `1px solid ${theme.deleteBorder}`, background: theme.deleteBg, color: "#FF5252", fontFamily: "'Inter'", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-          Удалить задачу
+          {t("task.delete")}
         </button>
       </div>
       </div>
@@ -474,6 +477,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
 
 // ── Node Card ──
 function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, singleTapEdit, onArchive, onDone }) {
+  const { t } = useLocale();
   const c = COLORS[colorIdx % COLORS.length];
   const ad = isAllDone(node);
   const { total, done } = countTasks(node);
@@ -615,7 +619,7 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
               onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
               onMouseLeave={e => e.currentTarget.style.opacity = "1"}
             >
-              Выполнить
+              {t("task.complete")}
             </div>
           )}
           {node.done && !node.archived && onArchive && (
@@ -625,7 +629,7 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
               onMouseEnter={e => e.currentTarget.style.color = "#5b3fc4"}
               onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
             >
-              → В архив
+              {t("task.archive")}
             </div>
           )}
         </div>
@@ -686,6 +690,7 @@ export default function Mindmap({
   taskId, onNavigateTask, onNavigateMap,
   bgUrl, onOpenBgPanel, onboarding, onStartOnboarding,
 }) {
+  const { t } = useLocale();
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [navPath, setNavPath]         = useState(["root"]);
   const [selectedId, setSelectedId]   = useState(null);
@@ -844,7 +849,7 @@ export default function Mindmap({
 
   const handleAdd = useCallback((pid) => {
     const newId = genId();
-    setTree(t => addChild(t, pid, { id: newId, text: "Новая задача", done: false, description: "", checklist: [], children: [] }));
+    setTree(tr => addChild(tr, pid, { id: newId, text: t("task.newDefault"), done: false, description: "", checklist: [], children: [] }));
     setNewTaskIds(prev => new Set([...prev, newId]));
     setTimeout(() => setNewTaskIds(prev => { const s = new Set(prev); s.delete(newId); return s; }), 600);
     onboarding?.completeStep("add-child");
@@ -868,7 +873,7 @@ export default function Mindmap({
   }, [setTree]);
 
   if (!tree) {
-    return <div style={{ width: "100%", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: theme.appBg, color: theme.textMuted, fontFamily: "'Inter',sans-serif" }}>Загрузка…</div>;
+    return <div style={{ width: "100%", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: theme.appBg, color: theme.textMuted, fontFamily: "'Inter',sans-serif" }}>{t("app.loading")}</div>;
   }
 
   const navNodeId  = navPath[navPath.length - 1];
@@ -1019,7 +1024,7 @@ export default function Mindmap({
           }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = theme.textDim; e.currentTarget.style.color = theme.text; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = theme.surfaceBorder; e.currentTarget.style.color = theme.textMuted; }}>
-            + Добавить задачу
+            {t("task.add")}
           </button>}
 
         </div>
@@ -1072,10 +1077,10 @@ export default function Mindmap({
           </div>
         );
         return (
-          <AppOverlay title="Сегодня" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
+          <AppOverlay title={t("menu.today")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
-              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
-              : <><Section title="Просрочено" list={overdue} /><Section title="Сегодня" list={today} /><Section title="На неделе" list={week} /></>}
+              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>{t("today.noTasksWeek")}</div>
+              : <><Section title={t("today.overdue")} list={overdue} /><Section title={t("today.today")} list={today} /><Section title={t("today.laterThisWeek")} list={week} /></>}
           </AppOverlay>
         );
       })()}
@@ -1084,22 +1089,22 @@ export default function Mindmap({
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <AppOverlay title="Архив" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
+          <AppOverlay title={t("archive.title")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
-              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
-              : items.map(t => {
-                const co = COLORS[(t.colorIdx ?? 0) % COLORS.length];
+              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>—</div>
+              : items.map(item => {
+                const co = COLORS[(item.colorIdx ?? 0) % COLORS.length];
                 return (
-                  <div key={`${t.mapId}/${t.id}`}
+                  <div key={`${item.mapId}/${item.id}`}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 4, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, borderRadius: 10 }}>
                     <div style={{ width: 8, height: 36, borderRadius: 4, background: co.bg, flexShrink: 0, opacity: 0.5 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.textDim, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.text}</div>
-                      <div style={{ fontSize: 11, color: theme.textFaint, marginTop: 2 }}>{t.mapName}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.textDim, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.text}</div>
+                      <div style={{ fontSize: 11, color: theme.textFaint, marginTop: 2 }}>{item.mapName}</div>
                     </div>
-                    <button onClick={() => restoreTask(t.mapId, t.id)}
+                    <button onClick={() => restoreTask(item.mapId, item.id)}
                       style={{ background: "transparent", border: `1px solid ${co.bg}`, color: co.bg, borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontFamily: "'Inter'", fontSize: 12, fontWeight: 700 }}>
-                      Восстановить
+                      {t("task.restore")}
                     </button>
                   </div>
                 );

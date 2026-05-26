@@ -3,6 +3,7 @@ import { useWindowWidth } from "./hooks";
 import { AppHeader, AppOverlay, glassStyle } from "./ui";
 import { boostTheme } from "./theme";
 import { EmptyHomeHint, OnboardingBanner, obWrongStep } from "./Onboarding";
+import { useLocale } from "./i18n.jsx";
 import {
   COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
   countTasks, countDirectKids,
@@ -10,12 +11,7 @@ import {
   updateNode, setAllDone,
 } from "./utils";
 
-const PRIORITY_OPTIONS = [
-  { value: null,     label: "Без приоритета", color: "transparent", border: true },
-  { value: "low",    label: "Низкий",         color: "#4CAF50" },
-  { value: "medium", label: "Средний",        color: "#FFC107" },
-  { value: "high",   label: "Высокий",        color: "#F44336" },
-];
+// PRIORITY_OPTIONS строится внутри EditModal через t()
 
 
 // Считаем задачи по приоритетам рекурсивно (только для StatsBar)
@@ -36,6 +32,7 @@ function countByPriority(node) {
 
 // ── Stats bar (desktop) ──
 function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) {
+  const { t } = useLocale();
   let totalTasks = 0, totalDone = 0;
   const pri = { high: 0, medium: 0, low: 0, none: 0 };
   maps.forEach(m => {
@@ -49,10 +46,10 @@ function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) 
   const priTotal = pri.high + pri.medium + pri.low;
 
   const chips = [
-    { label: "Проектов",  value: maps.length,    color: "#5b3fc4" },
-    { label: "Выполнено", value: `${totalDone} / ${totalTasks}`, color: "#22c55e" },
-    { label: "Просрочено",value: overdue.length,  color: overdue.length ? "#F44336" : theme.textMuted },
-    { label: "Сегодня",   value: today.length,    color: today.length   ? "#FB8C00" : theme.textMuted },
+    { label: t("stats.projects"),  value: maps.length,    color: "#5b3fc4" },
+    { label: t("stats.completed"), value: `${totalDone} / ${totalTasks}`, color: "#22c55e" },
+    { label: t("stats.overdue"),   value: overdue.length,  color: overdue.length ? "#F44336" : theme.textMuted },
+    { label: t("stats.today"),     value: today.length,    color: today.length   ? "#FB8C00" : theme.textMuted },
   ];
   return (
     <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "stretch" }}>
@@ -77,7 +74,7 @@ function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) 
       onMouseLeave={e => { if (onOpenPriorities) e.currentTarget.style.background = themeName === "dark" ? "rgba(15,14,35,0.55)" : "rgba(255,255,255,0.60)"; }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <span style={{ fontSize: 12, color: theme.textDim, fontWeight: 500 }}>Приоритеты</span>
+          <span style={{ fontSize: 12, color: theme.textDim, fontWeight: 500 }}>{t("stats.priorities")}</span>
           {priTotal > 0 ? (
             <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.5px" }}>
               <span style={{ color: "#F44336" }}>{pri.high}</span>
@@ -106,11 +103,12 @@ function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) 
 
 // ── Projects overview (desktop) ──
 function ProjectsOverview({ maps, theme, themeName, onOpenMap }) {
+  const { t } = useLocale();
   if (!maps.length) return null;
   return (
     <div style={{ marginTop: 28, borderRadius: 16, padding: "14px 12px", ...glassStyle(themeName) }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10, paddingLeft: 4 }}>
-        Прогресс (все задачи)
+        {t("home.progressTitle")}
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
         {maps.map((map, idx) => {
@@ -251,6 +249,7 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
 
 // ── Add card ──
 function AddCard({ theme, onClick }) {
+  const { t } = useLocale();
   return (
     <div
       data-ob="add-card"
@@ -273,7 +272,7 @@ function AddCard({ theme, onClick }) {
       onMouseLeave={e => { e.currentTarget.style.borderColor = theme.surfaceBorder; e.currentTarget.style.background = "transparent"; }}
     >
       <span style={{ fontSize: 28, fontWeight: 300, color: theme.textMuted, lineHeight: 1 }}>+</span>
-      <span style={{ fontSize: 12, color: theme.textMuted, fontFamily: "'Inter',sans-serif" }}>Новый проект</span>
+      <span style={{ fontSize: 12, color: theme.textMuted, fontFamily: "'Inter',sans-serif" }}>{t("home.newProject")}</span>
     </div>
   );
 }
@@ -333,12 +332,20 @@ function DeadlineSection({ title, tasks, maps, theme, onNavigateTask }) {
 
 // ── Edit modal ──
 function EditModal({ map, theme, onSave, onDelete, onClose }) {
+  const { t } = useLocale();
   const [name,     setName]     = useState(map.name || "");
   const [desc,     setDesc]     = useState(map.description || "");
   const [deadline, setDeadline] = useState(toLocalInput(map.deadline));
   const [priority, setPriority] = useState(map.priority || null);
   const [colorIdx, setColorIdx] = useState(map.colorIdx !== undefined ? map.colorIdx : 0);
   const [confirm,  setConfirm]  = useState(false);
+
+  const PRIORITY_OPTIONS = [
+    { value: null,     label: t("priority.none"), color: "transparent", border: true },
+    { value: "low",    label: t("priority.low"),  color: "#4CAF50" },
+    { value: "medium", label: t("priority.medium"), color: "#FFC107" },
+    { value: "high",   label: t("priority.high"),   color: "#F44336" },
+  ];
   const touchStartY = useRef(0);
   const onTouchStart = e => { touchStartY.current = e.touches[0].clientY; };
   const onTouchEnd = e => { if (e.changedTouches[0].clientY - touchStartY.current > 80) onClose(); };
@@ -378,15 +385,15 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
         }),
       }}>
         {!isDesktop && <div style={{ width: 44, height: 4, borderRadius: 2, background: theme.surfaceBorder, margin: "8px auto 16px", flexShrink: 0 }} />}
-        <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>Редактировать проект</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>{t("edit.title")}</div>
 
         {/* Название */}
-        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>Название</label>
+        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.name")}</label>
         <input value={name} onChange={e => setName(e.target.value)} autoFocus style={inp}
           onKeyDown={e => e.key === "Enter" && handleSave()} />
 
         {/* Цвет */}
-        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>Цвет</label>
+        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.color")}</label>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
           {COLORS.map((co, i) => (
             <div key={i} onClick={() => setColorIdx(i)}
@@ -404,17 +411,17 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
         </div>
 
         {/* Описание */}
-        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>Описание</label>
+        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.description")}</label>
         <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} style={{
           ...inp, resize: "vertical", lineHeight: 1.5,
         }} />
 
         {/* Срок */}
-        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>Срок</label>
+        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.deadline")}</label>
         <input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)} style={inp} />
 
         {/* Приоритет */}
-        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>Приоритет</label>
+        <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.priority")}</label>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {PRIORITY_OPTIONS.map(o => (
             <button key={String(o.value)} onClick={() => setPriority(o.value)}
@@ -437,7 +444,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
           marginTop: 4, padding: "12px", borderRadius: 12, border: "none",
           background: "#1E88E5", color: "#fff",
           fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 15, cursor: "pointer",
-        }}>Сохранить</button>
+        }}>{t("common.save")}</button>
 
         {/* Удалить */}
         {!confirm ? (
@@ -445,20 +452,20 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
             padding: "12px", borderRadius: 12, border: `1px solid ${theme.deleteBorder}`,
             background: theme.deleteBg, color: "#F44336",
             fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer",
-          }}>Удалить проект</button>
+          }}>{t("task.deleteProject")}</button>
         ) : (
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={onDelete} style={{
               flex: 1, padding: "11px", borderRadius: 12, border: "none",
               background: "#F44336", color: "#fff",
               fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
-              Да, удалить
+              {t("task.confirmDelete")}
             </button>
             <button onClick={() => setConfirm(false)} style={{
               flex: 1, padding: "11px", borderRadius: 12,
               border: `1px solid ${theme.surfaceBorder}`, background: "transparent", color: theme.textDim,
               fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-              Отмена
+              {t("task.cancelDelete")}
             </button>
           </div>
         )}
@@ -471,6 +478,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
 // ── Main component ──
 export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel, onboarding, onStartOnboarding }) {
+  const { t } = useLocale();
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [editing, setEditing] = useState(null);
   const [overlayMode, setOverlayMode] = useState(initialOverlay || null);
@@ -542,12 +550,12 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
     <div>
       {hasDeadlines ? (
         <>
-          <DeadlineSection title="Просрочено:" tasks={overdue} maps={maps} theme={theme} onNavigateTask={onNavigateTask} />
-          <DeadlineSection title="Сегодня:"    tasks={today}  maps={maps} theme={theme} onNavigateTask={onNavigateTask} />
-          <DeadlineSection title="На неделе:"  tasks={week}   maps={maps} theme={theme} onNavigateTask={onNavigateTask} />
+          <DeadlineSection title={`${t("today.overdue")}:`} tasks={overdue} maps={maps} theme={theme} onNavigateTask={onNavigateTask} />
+          <DeadlineSection title={`${t("today.today")}:`}   tasks={today}  maps={maps} theme={theme} onNavigateTask={onNavigateTask} />
+          <DeadlineSection title={`${t("today.laterThisWeek")}:`} tasks={week} maps={maps} theme={theme} onNavigateTask={onNavigateTask} />
         </>
       ) : (
-        <div style={{ fontSize: 13, color: theme.textMuted, padding: "4px 0 8px" }}>Нет ближайших задач</div>
+        <div style={{ fontSize: 13, color: theme.textMuted, padding: "4px 0 8px" }}>{t("today.noTasks")}</div>
       )}
     </div>
   );
@@ -712,10 +720,10 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
           </div>
         );
         return (
-          <AppOverlay title="Сегодня" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
+          <AppOverlay title={t("menu.today")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
-              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач со сроком в ближайшую неделю</div>
-              : <><Section title="Просрочено" list={overdue2} /><Section title="Сегодня" list={today2} /><Section title="На неделе" list={week2} /></>}
+              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>{t("today.noTasksWeek")}</div>
+              : <><Section title={t("today.overdue")} list={overdue2} /><Section title={t("today.today")} list={today2} /><Section title={t("today.laterThisWeek")} list={week2} /></>}
           </AppOverlay>
         );
       })()}
@@ -724,15 +732,15 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
       {overlayMode === "priorities" && (() => {
         const byPriority = collectByPriority(maps);
         const sections = [
-          { key: "high",   label: "Высокий",  color: "#F44336" },
-          { key: "medium", label: "Средний",  color: "#FFC107" },
-          { key: "low",    label: "Низкий",   color: "#4CAF50" },
+          { key: "high",   label: t("priority.high"),   color: "#F44336" },
+          { key: "medium", label: t("priority.medium"), color: "#FFC107" },
+          { key: "low",    label: t("priority.low"),    color: "#4CAF50" },
         ];
         const total = byPriority.high.length + byPriority.medium.length + byPriority.low.length;
         return (
-          <AppOverlay title="Приоритеты" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
+          <AppOverlay title={t("stats.priorities")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {total === 0
-              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Нет задач с приоритетом</div>
+              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>{t("today.noTasks")}</div>
               : sections.map(({ key, label, color }) => {
                 const list = byPriority[key];
                 return (
@@ -777,22 +785,22 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
       {overlayMode === "archive" && (() => {
         const items = collectArchived(maps);
         return (
-          <AppOverlay title="Архив" theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
+          <AppOverlay title={t("archive.title")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0
-              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>Архив пуст.</div>
-              : items.map(t => {
-                const co = COLORS[(t.colorIdx ?? 0) % COLORS.length];
+              ? <div style={{ color: theme.textDim, padding: 30, textAlign: "center" }}>—</div>
+              : items.map(item => {
+                const co = COLORS[(item.colorIdx ?? 0) % COLORS.length];
                 return (
-                  <div key={`${t.mapId}/${t.id}`}
+                  <div key={`${item.mapId}/${item.id}`}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 4, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, borderRadius: 10 }}>
                     <div style={{ width: 8, height: 36, borderRadius: 4, background: co.bg, flexShrink: 0, opacity: 0.5 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.textDim, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.text}</div>
-                      <div style={{ fontSize: 11, color: theme.textFaint, marginTop: 2 }}>{t.mapName}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.textDim, textDecoration: "line-through", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.text}</div>
+                      <div style={{ fontSize: 11, color: theme.textFaint, marginTop: 2 }}>{item.mapName}</div>
                     </div>
-                    <button onClick={() => restoreTask(t.mapId, t.id)}
+                    <button onClick={() => restoreTask(item.mapId, item.id)}
                       style={{ background: "transparent", border: `1px solid ${co.bg}`, color: co.bg, borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontFamily: "'Inter'", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-                      Восстановить
+                      {t("task.restore")}
                     </button>
                   </div>
                 );
