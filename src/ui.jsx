@@ -4,6 +4,7 @@
 import { useState, useRef } from "react";
 import BrandLogo from "./BrandLogo";
 import { useLocale, LANGS } from "./i18n.jsx";
+import { PRIORITY_COLORS, BRAND_COLOR } from "./utils";
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 export function SunIcon({ size = 16 }) {
@@ -21,6 +22,40 @@ export function MoonIcon({ size = 16 }) {
       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
     </svg>
+  );
+}
+export function ShareIcon({ size = 14 }) {
+  return (
+    <svg style={{ display: "inline", verticalAlign: "middle", marginBottom: 1 }}
+      width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+      <polyline points="16 6 12 2 8 6"/>
+      <line x1="12" y1="2" x2="12" y2="15"/>
+    </svg>
+  );
+}
+
+// ── Shared UI atoms ───────────────────────────────────────────────────────────
+
+/** Цветная точка приоритета. Возвращает null если priority не задан. */
+export function PriorityDot({ priority, size = 8 }) {
+  if (!priority || !PRIORITY_COLORS[priority]) return null;
+  return (
+    <div style={{ width: size, height: size, borderRadius: "50%", background: PRIORITY_COLORS[priority].bg, flexShrink: 0 }} />
+  );
+}
+
+/**
+ * Горизонтальный прогресс-бар.
+ * pct — 0..100, color — цвет заливки, trackColor — цвет фона, style — доп. стили контейнера.
+ */
+export function ProgressBar({ pct, color, trackColor, height = 4, style }) {
+  const radius = Math.ceil(height / 2);
+  return (
+    <div style={{ height, borderRadius: radius, background: trackColor, overflow: "hidden", ...style }}>
+      <div style={{ height: "100%", width: `${pct}%`, borderRadius: "inherit", background: color, transition: "width .5s" }} />
+    </div>
   );
 }
 
@@ -229,9 +264,9 @@ export function AppHeader({ theme, themeName, onToggleTheme, onSignOut, onGoHome
             style={{ background: "none", border: "none", cursor: "pointer", padding: 6,
               display: "flex", flexDirection: "column", gap: 5.5 }}
           >
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(9.5px) rotate(45deg)" : "none" }} />
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "opacity .2s", opacity: menuOpen ? 0 : 1 }} />
-            <div style={{ width: 24, height: 4, borderRadius: 2, background: "#5b3fc4", transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(-9.5px) rotate(-45deg)" : "none" }} />
+            <div style={{ width: 24, height: 4, borderRadius: 2, background: BRAND_COLOR, transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(9.5px) rotate(45deg)" : "none" }} />
+            <div style={{ width: 24, height: 4, borderRadius: 2, background: BRAND_COLOR, transition: "opacity .2s", opacity: menuOpen ? 0 : 1 }} />
+            <div style={{ width: 24, height: 4, borderRadius: 2, background: BRAND_COLOR, transition: "transform .25s", transformOrigin: "center", transform: menuOpen ? "translateY(-9.5px) rotate(-45deg)" : "none" }} />
           </button>
           {menuOpen && (
             <AppMenu

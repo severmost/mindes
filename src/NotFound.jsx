@@ -1,4 +1,5 @@
 import { useLocale } from "./i18n.jsx";
+import { BRAND_COLOR } from "./utils";
 
 export default function NotFound({ theme, onGoHome }) {
   const { t } = useLocale();
@@ -31,7 +32,7 @@ export default function NotFound({ theme, onGoHome }) {
           padding: "12px 28px",
           borderRadius: 14,
           border: "none",
-          background: "#5b3fc4",
+          background: BRAND_COLOR,
           color: "#fff",
           fontSize: 15,
           fontWeight: 700,

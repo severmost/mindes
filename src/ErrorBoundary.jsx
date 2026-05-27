@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { BRAND_COLOR } from "./utils";
 
 // Error Boundary — перехватывает JS-ошибки в дочерних компонентах
 // и показывает понятный экран вместо белого пустого окна.
@@ -47,7 +48,7 @@ export default class ErrorBoundary extends Component {
           style={{
             marginTop: 8,
             padding: "10px 24px", borderRadius: 10,
-            background: "#5b3fc4", color: "#fff",
+            background: BRAND_COLOR, color: "#fff",
             border: "none", fontSize: 14, fontWeight: 600,
             cursor: "pointer",
           }}

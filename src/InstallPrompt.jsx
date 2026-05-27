@@ -6,6 +6,8 @@
 
 import { useState, useEffect } from "react";
 import { useLocale } from "./i18n.jsx";
+import { ShareIcon } from "./ui";
+import { BRAND_COLOR } from "./utils";
 
 const STORAGE_KEY = "mindes_install_dismissed";
 
@@ -80,7 +82,7 @@ export default function InstallPrompt({ theme }) {
       <div style={{ display: "flex", alignItems: "center", gap: 14, maxWidth: 480, margin: "0 auto" }}>
         <img src="/icon.svg" alt="Mindes" style={{
           width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-          background: "#5b3fc4",
+          background: BRAND_COLOR,
         }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 15, color: theme.text, marginBottom: 3 }}>
@@ -104,7 +106,7 @@ export default function InstallPrompt({ theme }) {
           <button onClick={install} style={{
             flexShrink: 0, padding: "9px 16px",
             borderRadius: 10, border: "none",
-            background: "#5b3fc4", color: "#fff",
+            background: BRAND_COLOR, color: "#fff",
             fontFamily: "'Inter'", fontWeight: 700, fontSize: 13,
             cursor: "pointer", whiteSpace: "nowrap",
           }}>{t("install.button")}</button>
@@ -119,14 +121,3 @@ export default function InstallPrompt({ theme }) {
   );
 }
 
-function ShareIcon() {
-  return (
-    <svg style={{ display: "inline", verticalAlign: "middle", marginBottom: 1 }}
-      width="14" height="14" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-      <polyline points="16 6 12 2 8 6"/>
-      <line x1="12" y1="2" x2="12" y2="15"/>
-    </svg>
-  );
-}

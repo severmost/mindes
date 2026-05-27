@@ -3,11 +3,7 @@
 // даже если приложение закрыто). В браузере — Notification API через
 // setTimeout (работает пока вкладка открыта).
 
-import { Capacitor } from "@capacitor/core";
-
-const isNative = () => {
-  try { return Capacitor.isNativePlatform(); } catch { return false; }
-};
+import { isNative } from "./platform";
 
 // Стабильный numeric id из строкового taskId (нужен Capacitor LocalNotifications).
 function hashId(s) {

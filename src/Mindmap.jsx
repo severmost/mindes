@@ -5,12 +5,12 @@
 import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { ensureNotificationPermission } from "./notifications";
 import { useWindowWidth } from "./hooks";
-import { AppHeader, AppOverlay, glassStyle } from "./ui";
+import { AppHeader, AppOverlay, glassStyle, PriorityDot, ProgressBar } from "./ui";
 import { boostTheme } from "./theme";
 import { OnboardingBanner, obWrongStep } from "./Onboarding";
 import { useLocale } from "./i18n.jsx";
 import {
-  COLORS, PRIORITY_COLORS, genId,
+  COLORS, PRIORITY_COLORS, BRAND_COLOR, genId,
   toLocalInput, fromLocalInput, formatDeadline,
   calcNextDeadline, collectBranchStats,
   countTasks, countDirectKids,
@@ -63,9 +63,7 @@ function BranchStats({ node, theme, onAdd }) {
           <span style={{ fontSize: 26, fontWeight: 800, color: theme.text, lineHeight: 1 }}>{pct}%</span>
           <span style={{ fontSize: 12, color: theme.textMuted }}>{done} / {total}</span>
         </div>
-        <div style={{ height: 6, borderRadius: 3, background: theme.progressTrack, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${pct}%`, borderRadius: 3, background: pct === 100 ? "#22c55e" : "#5b3fc4", transition: "width .5s" }} />
-        </div>
+        <ProgressBar pct={pct} color={pct === 100 ? "#22c55e" : BRAND_COLOR} trackColor={theme.progressTrack} height={6} />
       </div>
 
       {/* Priorities */}
@@ -446,9 +444,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
             {t("checklist.title")} {cl.length > 0 && <span style={{ fontSize: 11, color: theme.textFaint, fontWeight: 400, textTransform: "none" }}>{cd}/{cl.length}</span>}
           </div>
           {cl.length > 0 && (
-            <div style={{ height: 4, borderRadius: 2, background: theme.progressTrack, marginBottom: 10, overflow: "hidden" }}>
-              <div style={{ height: "100%", borderRadius: 2, background: branchColor.bg, width: `${(cd / cl.length) * 100}%`, transition: "width .3s" }} />
-            </div>
+            <ProgressBar pct={(cd / cl.length) * 100} color={branchColor.bg} trackColor={theme.progressTrack} height={4} style={{ marginBottom: 10 }} />
           )}
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {cl.map(item => (
@@ -603,16 +599,12 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
         {dkTotal > 0 && <span style={{ fontSize: 11, color: theme.textMuted }}>{dkDone}/{dkTotal}</span>}
         {dl && <span style={{ fontSize: 11, fontWeight: 600, color: dl.color || theme.textMuted, marginLeft: total > 0 ? "auto" : 0 }}>{dl.text}</span>}
         {!dl && total > 0 && <div style={{ flex: 1 }} />}
-        {node.priority && PRIORITY_COLORS[node.priority] && (
-          <div style={{ width: 7, height: 7, borderRadius: "50%", background: PRIORITY_COLORS[node.priority].bg, flexShrink: 0 }} />
-        )}
+        <PriorityDot priority={node.priority} size={7} />
       </div>
 
       {/* Progress bar */}
       {level < 2 && total > 0 && (
-        <div style={{ height: 3, borderRadius: 2, background: theme.progressTrack, overflow: "hidden", marginTop: 8 }}>
-          <div style={{ height: "100%", width: `${(done / total) * 100}%`, background: ad ? theme.surfaceBorder : c.bg, borderRadius: "inherit", transition: "width .3s" }} />
-        </div>
+        <ProgressBar pct={(done / total) * 100} color={ad ? theme.surfaceBorder : c.bg} trackColor={theme.progressTrack} height={3} style={{ marginTop: 8 }} />
       )}
       {(node.done || onDone || onArchive) && (
         <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end", gap: 12 }}>
@@ -630,7 +622,7 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
             <div
               onClick={e => { e.stopPropagation(); onArchive(node.id); }}
               style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, cursor: "pointer", letterSpacing: 0.2 }}
-              onMouseEnter={e => e.currentTarget.style.color = "#5b3fc4"}
+              onMouseEnter={e => e.currentTarget.style.color = BRAND_COLOR}
               onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
             >
               {t("task.archive")}
@@ -1069,7 +1061,7 @@ export default function Mindmap({
                     onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
                     onMouseLeave={e => e.currentTarget.style.background = theme.surfaceBg}>
                     <div style={{ width: 8, height: 36, borderRadius: 4, background: co.bg, flexShrink: 0 }} />
-                    {t.priority && PRIORITY_COLORS[t.priority] && <div style={{ width: 8, height: 8, borderRadius: "50%", background: PRIORITY_COLORS[t.priority].bg, flexShrink: 0 }} />}
+                    <PriorityDot priority={t.priority} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.text}</div>
                       <div style={{ fontSize: 11, color: theme.textDim, marginTop: 2 }}>{t.mapName}</div>
