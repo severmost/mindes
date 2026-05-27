@@ -134,8 +134,10 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
   if (!node) return null;
   const allDone = isAllDone(node);
   const { total, done } = countTasks(node);
-  const [title, setTitle] = useState(node.text);
-  const [desc, setDesc] = useState(node.description || "");
+  const [titleDirty, setTitleDirty] = useState(false);
+  const [descDirty, setDescDirty] = useState(false);
+  const titleRef = useRef(null);
+  const descRef = useRef(null);
   const [newItem, setNewItem] = useState("");
   const [showColors, setShowColors] = useState(false);
   const [deadline, setDeadline] = useState(node.deadline || "");
@@ -146,8 +148,8 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
   const [repeatEvery, setRepeatEvery] = useState(node.repeat?.every || 2);
 
   useEffect(() => {
-    setTitle(node.text);
-    setDesc(node.description || "");
+    setTitleDirty(false);
+    setDescDirty(false);
     setDeadline(node.deadline || "");
     setRemindEnabled(!!node.remindBefore);
     if (node.remindBefore) { setRemindH(Math.floor(node.remindBefore / 60)); setRemindM(node.remindBefore % 60); }
@@ -279,23 +281,33 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
         </div>
       )}
       <div style={{ padding: "16px 20px 12px", display: "flex", alignItems: "flex-start", gap: 8, flexShrink: 0 }}>
-        <textarea className="pi" value={title}
-          onChange={e => {
-            setTitle(e.target.value);
+        <textarea className="pi"
+          key={node.id}
+          defaultValue={node.text}
+          onInput={e => {
+            const v = e.target.value;
             e.target.style.height = "auto";
             e.target.style.height = e.target.scrollHeight + "px";
+            setTitleDirty(v.trim() !== (node.text || ""));
           }}
           onCompositionEnd={e => {
-            setTitle(e.target.value);
+            const v = e.target.value;
             e.target.style.height = "auto";
             e.target.style.height = e.target.scrollHeight + "px";
+            setTitleDirty(v.trim() !== (node.text || ""));
           }}
-          onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (title.trim()) { save("text", title.trim()); e.target.blur(); } } }}
+          onKeyDown={e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              const v = titleRef.current?.value?.trim();
+              if (v) { save("text", v); setTitleDirty(false); e.target.blur(); }
+            }
+          }}
           rows={1}
-          ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
+          ref={el => { titleRef.current = el; if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
           style={{ fontSize: 17, fontWeight: 700, flex: 1, resize: "none", lineHeight: 1.35, overflow: "hidden" }} />
-        {title.trim() && title.trim() !== (node.text || "") && (
-          <button onClick={() => save("text", title.trim())}
+        {titleDirty && (
+          <button onClick={() => { const v = titleRef.current?.value?.trim(); if (v) { save("text", v); setTitleDirty(false); } }}
             style={{ background: "#22c55e", border: "none", borderRadius: 8, width: 34, height: 34, color: "#fff", fontSize: 16, cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2 }}>✓</button>
         )}
         {isMobile && <button onClick={onClose} style={{ background: "none", border: "none", color: theme.textMuted, fontSize: 22, cursor: "pointer", lineHeight: 1, flexShrink: 0, marginTop: 2 }}>×</button>}
@@ -424,22 +436,26 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
         {/* Description */}
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: theme.sectionLabel, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.2 }}>{t("common.description")}</div>
-          <textarea className="pi" value={desc}
-            onChange={e => {
-              setDesc(e.target.value);
+          <textarea className="pi"
+            key={node.id}
+            defaultValue={node.description || ""}
+            onInput={e => {
+              const v = e.target.value;
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
+              setDescDirty(v !== (node.description || ""));
             }}
             onCompositionEnd={e => {
-              setDesc(e.target.value);
+              const v = e.target.value;
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
+              setDescDirty(v !== (node.description || ""));
             }}
             placeholder={t("task.descPlaceholder")} rows={3}
-            ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
+            ref={el => { descRef.current = el; if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
             style={{ resize: "none", minHeight: 60, overflow: "hidden", lineHeight: 1.4 }} />
-          {desc !== (node.description || "") && (
-            <button onClick={() => save("description", desc)}
+          {descDirty && (
+            <button onClick={() => { save("description", descRef.current?.value || ""); setDescDirty(false); }}
               style={{ marginTop: 6, padding: "7px 16px", borderRadius: 8, border: "none", background: "#22c55e", color: "#fff", fontFamily: "'Inter'", fontWeight: 700, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
               {t("task.saveDesc")}
             </button>
