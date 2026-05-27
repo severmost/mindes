@@ -2,6 +2,8 @@ import { useState } from "react";
 import { signInWithGoogle } from "./auth";
 import { themes } from "./theme";
 import { useLocale } from "./i18n.jsx";
+import { MoonIcon, SunIcon } from "./ui";
+import { BRAND_COLOR } from "./utils";
 
 /* ── палитра карточек-превью ── */
 const CARD_COLORS = {
@@ -74,22 +76,6 @@ function GoogleLogo() {
   );
 }
 
-/* ── Moon / Sun icons ── */
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-  );
-}
-function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="4"/>
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-    </svg>
-  );
-}
 
 /* ════════════════════════════════════════════════════════════════ */
 export default function Login({ theme = themes.dark, themeName, onToggleTheme }) {
@@ -140,7 +126,7 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
     taskShadow:"0 16px 40px -16px rgba(40,20,100,0.25), 0 4px 10px -4px rgba(40,20,100,0.1)",
     toggleBg: "#ffffff",
     toggleBorder:"rgba(91,63,196,0.12)",
-    accentTitle:"#5b3fc4",
+    accentTitle:BRAND_COLOR,
     gradient: `radial-gradient(60% 80% at 100% 50%, rgba(124,95,230,0.18), transparent 70%),
                radial-gradient(50% 70% at 0% 100%, rgba(59,130,246,0.12), transparent 70%),
                #ede8ff`,

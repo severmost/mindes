@@ -24,6 +24,9 @@ export const PRIORITY_COLORS = {
   high:   { bg: "#F44336", label: "Высокая" },
 };
 
+// ── Бренд ─────────────────────────────────────────────────────────────────────
+export const BRAND_COLOR = "#5b3fc4";
+
 // ── ID-генератор ──────────────────────────────────────────────────────────────
 export const genId = () => Math.random().toString(36).slice(2, 9);
 
@@ -66,6 +69,25 @@ export function formatDeadline(iso) {
 }
 
 // ── Счётчики задач ────────────────────────────────────────────────────────────
+
+/**
+ * Рекурсивно считает задачи по приоритетам в одном дереве (не собирает объекты).
+ * Используется в StatsBar и подобных компонентах.
+ */
+export function countByPriority(node) {
+  const out = { high: 0, medium: 0, low: 0, none: 0 };
+  const walk = n => {
+    if (!n.done) {
+      if (n.priority === "high")        out.high++;
+      else if (n.priority === "medium") out.medium++;
+      else if (n.priority === "low")    out.low++;
+      else                              out.none++;
+    }
+    for (const c of n.children || []) walk(c);
+  };
+  walk(node);
+  return out;
+}
 
 /** Рекурсивно считает все задачи-листья в поддереве, исключая архивные. */
 export function countTasks(n) {

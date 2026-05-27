@@ -1,6 +1,7 @@
 // Логотип + название "Mindes" для шапки.
 // На нативном Android (Capacitor) — только иконка без текста.
 
+import { BRAND_COLOR } from "./utils";
 const IS_NATIVE = Boolean(window?.Capacitor?.isNativePlatform?.());
 
 export default function BrandLogo({ size = 32, fontSize = 17, onClick, style }) {
@@ -29,7 +30,7 @@ export default function BrandLogo({ size = 32, fontSize = 17, onClick, style }) 
           letterSpacing: "-0.3px",
           lineHeight: 1,
         }}>
-          <span style={{ color: "#5b3fc4" }}>M</span>
+          <span style={{ color: BRAND_COLOR }}>M</span>
           <span style={{ color: "inherit" }}>indes</span>
         </span>
       )}

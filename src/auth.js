@@ -3,7 +3,6 @@
 // На Android — нативный Google Sign-In через @capacitor-firebase/authentication,
 // затем обмениваем idToken на сессию JS SDK, чтобы Firestore работал одинаково.
 
-import { Capacitor } from "@capacitor/core";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -12,14 +11,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "./firebase";
-
-const isNative = () => {
-  try {
-    return Capacitor.isNativePlatform();
-  } catch {
-    return false;
-  }
-};
+import { isNative } from "./platform";
 
 export async function signInWithGoogle() {
   if (isNative()) {

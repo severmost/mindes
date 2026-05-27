@@ -1,34 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useWindowWidth } from "./hooks";
-import { AppHeader, AppOverlay, glassStyle } from "./ui";
+import { AppHeader, AppOverlay, glassStyle, PriorityDot, ProgressBar } from "./ui";
 import { boostTheme } from "./theme";
 import { EmptyHomeHint, OnboardingBanner, obWrongStep } from "./Onboarding";
 import { useLocale } from "./i18n.jsx";
 import {
-  COLORS, PRIORITY_COLORS, toLocalInput, fromLocalInput, formatDeadline,
-  countTasks, countDirectKids,
+  COLORS, PRIORITY_COLORS, BRAND_COLOR, toLocalInput, fromLocalInput, formatDeadline,
+  countTasks, countDirectKids, countByPriority,
   collectByDeadline, collectArchived, collectByPriority,
   updateNode, setAllDone,
 } from "./utils";
 
 // PRIORITY_OPTIONS строится внутри EditModal через t()
-
-
-// Считаем задачи по приоритетам рекурсивно (только для StatsBar)
-function countByPriority(node) {
-  const out = { high: 0, medium: 0, low: 0, none: 0 };
-  const walk = n => {
-    if (!n.done) {
-      if (n.priority === "high")        out.high++;
-      else if (n.priority === "medium") out.medium++;
-      else if (n.priority === "low")    out.low++;
-      else                              out.none++;
-    }
-    for (const c of n.children || []) walk(c);
-  };
-  walk(node);
-  return out;
-}
 
 // ── Stats bar (desktop) ──
 function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) {
@@ -46,7 +29,7 @@ function StatsBar({ maps, overdue, today, theme, themeName, onOpenPriorities }) 
   const priTotal = pri.high + pri.medium + pri.low;
 
   const chips = [
-    { label: t("stats.projects"),  value: maps.length,    color: "#5b3fc4" },
+    { label: t("stats.projects"),  value: maps.length,    color: BRAND_COLOR },
     { label: t("stats.completed"), value: `${totalDone} / ${totalTasks}`, color: "#22c55e" },
     { label: t("stats.overdue"),   value: overdue.length,  color: overdue.length ? "#F44336" : theme.textMuted },
     { label: t("stats.today"),     value: today.length,    color: today.length   ? "#FB8C00" : theme.textMuted },
@@ -127,9 +110,7 @@ function ProjectsOverview({ maps, theme, themeName, onOpenMap }) {
                   <span style={{ fontSize: 13, fontWeight: 600, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{map.name}</span>
                   <span style={{ fontSize: 11, color: theme.textMuted, flexShrink: 0, marginLeft: 10 }}>{done}/{total}</span>
                 </div>
-                <div style={{ height: 4, borderRadius: 2, background: theme.progressTrack, overflow: "hidden" }}>
-                  <div style={{ width: `${pct}%`, height: "100%", background: c.bg, borderRadius: 2, transition: "width .5s" }} />
-                </div>
+                <ProgressBar pct={pct} color={c.bg} trackColor={theme.progressTrack} height={4} />
               </div>
               <span style={{ fontSize: 12, fontWeight: 700, color: pct === 100 ? "#22c55e" : theme.textMuted, flexShrink: 0, width: 32, textAlign: "right" }}>
                 {pct}%
@@ -233,15 +214,13 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
         )}
         {!dlFmt && total > 0 && <div style={{ flex: 1 }} />}
         {priority && PRIORITY_COLORS[priority] && (
-          <div style={{ width: 7, height: 7, borderRadius: "50%", background: PRIORITY_COLORS[priority].bg, flexShrink: 0 }} />
+          <PriorityDot priority={priority} size={7} />
         )}
       </div>
 
       {/* Progress bar */}
       {totalAll > 0 && (
-        <div style={{ height: 3, borderRadius: 2, background: theme.progressTrack, overflow: "hidden", marginTop: 8 }}>
-          <div style={{ height: "100%", width: `${(doneAll / totalAll) * 100}%`, background: c.bg, borderRadius: "inherit", transition: "width .3s" }} />
-        </div>
+        <ProgressBar pct={(doneAll / totalAll) * 100} color={c.bg} trackColor={theme.progressTrack} height={3} style={{ marginTop: 8 }} />
       )}
     </div>
   );
@@ -715,7 +694,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                     onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
                     onMouseLeave={e => e.currentTarget.style.background = theme.surfaceBg}>
                     <div style={{ width: 8, height: 36, borderRadius: 4, background: co.bg, flexShrink: 0 }} />
-                    {task.priority && PRIORITY_COLORS[task.priority] && <div style={{ width: 8, height: 8, borderRadius: "50%", background: PRIORITY_COLORS[task.priority].bg, flexShrink: 0 }} />}
+                    <PriorityDot priority={task.priority} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{task.text}</div>
                       <div style={{ fontSize: 11, color: theme.textDim, marginTop: 2 }}>{task.mapName}</div>

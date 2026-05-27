@@ -3,6 +3,7 @@
 // когда соответствующее действие сделано впервые.
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { BRAND_COLOR } from "./utils";
 import { glassStyle } from "./ui";
 import { useLocale } from "./i18n.jsx";
 
@@ -301,8 +302,8 @@ export function OnboardingBanner({ onboarding, theme }) {
             <div key={s.id} style={{
               width: i === stepIdx ? 18 : 6, height: 6, borderRadius: 3,
               background: state.completed.includes(s.id)
-                ? "#5b3fc4"
-                : i === stepIdx ? "#5b3fc4cc" : "rgba(255,255,255,0.3)",
+                ? BRAND_COLOR
+                : i === stepIdx ? `${BRAND_COLOR}cc` : "rgba(255,255,255,0.3)",
               transition: "all .25s ease",
             }} />
           ))}

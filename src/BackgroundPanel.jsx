@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { saveBgUrl, clearBg } from "./background";
+import { BRAND_COLOR } from "./utils";
 import { useLocale } from "./i18n.jsx";
 
 export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }) {
@@ -118,7 +119,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
               disabled={saving || !urlInput.trim()}
               style={{
                 padding: "11px 0", borderRadius: 10,
-                background: "#5b3fc4", color: "#fff", border: "none",
+                background: BRAND_COLOR, color: "#fff", border: "none",
                 fontSize: 14, cursor: "pointer", fontWeight: 600,
                 opacity: (!urlInput.trim() || saving) ? 0.45 : 1,
                 transition: "opacity .15s",
