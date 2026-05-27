@@ -336,6 +336,8 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
   const [name,     setName]     = useState(map.name || "");
   const [desc,     setDesc]     = useState(map.description || "");
   const [deadline, setDeadline] = useState(toLocalInput(map.deadline));
+  const nameRef = useRef(null);
+  const descRef = useRef(null);
   const [priority, setPriority] = useState(map.priority || null);
   const [colorIdx, setColorIdx] = useState(map.colorIdx !== undefined ? map.colorIdx : 0);
   const [confirm,  setConfirm]  = useState(false);
@@ -356,8 +358,10 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
     outline: "none", boxSizing: "border-box" };
 
   const handleSave = () => {
-    if (!name.trim()) return;
-    onSave({ name: name.trim(), description: desc, deadline: fromLocalInput(deadline), priority, colorIdx });
+    const n = (nameRef.current?.value ?? name).trim();
+    const d = descRef.current?.value ?? desc;
+    if (!n) return;
+    onSave({ name: n, description: d, deadline: fromLocalInput(deadline), priority, colorIdx });
   };
 
   const winW = useWindowWidth();
@@ -391,6 +395,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
         <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.name")}</label>
         <input value={name} onChange={e => setName(e.target.value)}
           onCompositionEnd={e => setName(e.target.value)} autoFocus style={inp}
+          ref={nameRef}
           onKeyDown={e => e.key === "Enter" && handleSave()} />
 
         {/* Цвет */}
@@ -416,7 +421,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
         <textarea value={desc} onChange={e => setDesc(e.target.value)}
           onCompositionEnd={e => setDesc(e.target.value)} rows={3} style={{
           ...inp, resize: "vertical", lineHeight: 1.5,
-        }} />
+        }} ref={descRef} />
 
         {/* Срок */}
         <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.deadline")}</label>
