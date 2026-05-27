@@ -34,8 +34,8 @@ export default function InstallPrompt({ theme }) {
     const isSafariBrowser = /Safari/.test(ua) && !/CriOS|FxiOS|Chrome|EdgiOS/.test(ua);
     if (isIOS && isSafariBrowser) {
       // Небольшая задержка чтобы не мешать первому рендеру
-      const t = setTimeout(() => { setMode("ios"); setShow(true); }, 3000);
-      return () => clearTimeout(t);
+      const installTimeout = setTimeout(() => { setMode("ios"); setShow(true); }, 3000);
+      return () => clearTimeout(installTimeout);
     }
 
     // Android Chrome / Desktop Chrome — beforeinstallprompt
