@@ -1,5 +1,8 @@
 node_modules
 dist
+public/*.jpg
+public/*.jpeg
+screenshots/
 .env.local
 .env
 *.log
