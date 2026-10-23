@@ -48,6 +48,17 @@ export function fromLocalInput(v) {
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
 
+/** Отправляем только изменённые поля проекта, сохраняя точность исходного срока. */
+export function collectMapDetailsChanges(original, draft) {
+  const changes = {};
+  if (draft.name !== original.name) changes.name = draft.name;
+  if (draft.description !== original.description) changes.description = draft.description;
+  if (draft.deadline !== toLocalInput(original.deadline)) changes.deadline = fromLocalInput(draft.deadline);
+  if (draft.priority !== original.priority) changes.priority = draft.priority;
+  if (draft.colorIdx !== original.colorIdx) changes.colorIdx = draft.colorIdx;
+  return changes;
+}
+
 /**
  * Форматирует дедлайн для отображения в карточках и списках.
  * @param {string|null} iso — ISO-строка дедлайна
@@ -111,9 +122,7 @@ export function countDirectKids(node) {
  * Возвращает все незавершённые задачи с дедлайном, разбитые по бакетам:
  * "overdue" / "today" / "week".
  */
-export function collectByDeadline(maps) {
-  const now        = new Date();
-  const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+export function collectByDeadline(maps, now = new Date()) {
   const todayEnd   = new Date(now); todayEnd.setHours(23, 59, 59, 999);
   const weekEnd    = new Date(now); weekEnd.setDate(weekEnd.getDate() + 7);
   const out = [];
@@ -125,7 +134,7 @@ export function collectByDeadline(maps) {
         const d = new Date(node.deadline);
         if (!isNaN(d.getTime())) {
           let bucket;
-          if (d < todayStart)      bucket = "overdue";
+          if (d < now)             bucket = "overdue";
           else if (d <= todayEnd)  bucket = "today";
           else if (d <= weekEnd)   bucket = "week";
           if (bucket) out.push({

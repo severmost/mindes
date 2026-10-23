@@ -1,5 +1,5 @@
 // Service Worker — Mindes PWA
-const CACHE = "mindes-v2";
+const CACHE = "mindes-v3";
 const SHELL = ["/", "/index.html"];
 
 self.addEventListener("install", e => {
@@ -23,7 +23,7 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const { request } = e;
   if (request.method !== "GET") return;
-  if (!request.url.startsWith(self.location.origin)) return;
+  if (new URL(request.url).origin !== self.location.origin) return;
 
   // Не кешируем Firebase / Firestore / auth запросы
   if (

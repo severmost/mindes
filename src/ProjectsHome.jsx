@@ -5,7 +5,8 @@ import { boostTheme } from "./theme";
 import { EmptyHomeHint, OnboardingBanner, obWrongStep } from "./Onboarding";
 import { useLocale } from "./i18n.jsx";
 import {
-  COLORS, PRIORITY_COLORS, BRAND_COLOR, toLocalInput, fromLocalInput, formatDeadline,
+  COLORS, PRIORITY_COLORS, BRAND_COLOR, toLocalInput, formatDeadline,
+  collectMapDetailsChanges,
   countTasks, countDirectKids, countByPriority,
   collectByDeadline, collectArchived, collectByPriority,
   updateNode, setAllDone,
@@ -189,7 +190,7 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
       onMouseLeave={e => e.currentTarget.style.opacity = "1"}
     >
       {/* Title */}
-      <div style={{
+      <div title={map.name} style={{
         fontWeight: 700, fontSize: 15, lineHeight: 1.3, color: theme.text,
         marginBottom: 6,
         display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
@@ -197,7 +198,7 @@ function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesk
 
       {/* Description */}
       {desc && (
-        <div style={{
+        <div title={desc} style={{
           fontSize: 12, color: theme.textDim, lineHeight: 1.4, flex: 1, marginBottom: 8,
           display: "-webkit-box", WebkitLineClamp: isDesktop ? 6 : 3, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>{desc}</div>
@@ -337,10 +338,12 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
     outline: "none", boxSizing: "border-box" };
 
   const handleSave = () => {
-    const n = (nameRef.current?.value ?? name).trim();
+    const n = nameRef.current?.value ?? name;
     const d = descRef.current?.value ?? desc;
-    if (!n) return;
-    onSave({ name: n, description: d, deadline: fromLocalInput(deadline), priority, colorIdx });
+    if (!n.trim()) return;
+    onSave(collectMapDetailsChanges(map, {
+      name: n, description: d, deadline, priority, colorIdx,
+    }));
   };
 
   const winW = useWindowWidth();
@@ -348,7 +351,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
   return (
     <>
       <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.45)", animation: "fadeIn .2s ease" }} />
-      <div onClick={e => e.stopPropagation()} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{
+      <div onClick={e => e.stopPropagation()} style={{
         position: "fixed", zIndex: 101,
         background: theme.panelBg,
         display: "flex", flexDirection: "column", gap: 10,
@@ -367,7 +370,10 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
           padding: "8px 20px 32px",
         }),
       }}>
-        {!isDesktop && <div style={{ width: 44, height: 4, borderRadius: 2, background: theme.surfaceBorder, margin: "8px auto 16px", flexShrink: 0 }} />}
+        {!isDesktop && <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+          style={{ padding: "8px 0 16px", flexShrink: 0, touchAction: "none" }}>
+          <div style={{ width: 44, height: 4, borderRadius: 2, background: theme.surfaceBorder, margin: "0 auto" }} />
+        </div>}
         <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>{t("edit.title")}</div>
 
         {/* Название */}
@@ -375,7 +381,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
         <input value={name} onChange={e => setName(e.target.value)}
           onCompositionEnd={e => setName(e.target.value)} autoFocus style={inp}
           ref={nameRef}
-          onKeyDown={e => e.key === "Enter" && handleSave()} />
+          onKeyDown={e => { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) handleSave(); }} />
 
         {/* Цвет */}
         <label style={{ fontSize: 12, color: theme.textDim, fontWeight: 600 }}>{t("edit.color")}</label>
@@ -463,7 +469,7 @@ function EditModal({ map, theme, onSave, onDelete, onClose }) {
 
 
 // ── Main component ──
-export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onRenameMap, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel, onboarding, onStartOnboarding }) {
+export default function ProjectsHome({ maps, theme: themeProp, themeName, onToggleTheme, onOpenMap, onGoHome, onAddMap, onDeleteMap, onSaveMapDetails, onUpdateTree, user, onSignOut, onNavigateTask, initialOverlay, onOverlayClose, bgUrl, onOpenBgPanel, onboarding, onStartOnboarding }) {
   const { t } = useLocale();
   const theme = bgUrl ? boostTheme(themeProp) : themeProp;
   const [editing, setEditing] = useState(null);
@@ -656,14 +662,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
           map={editing}
           theme={theme}
           onSave={(fields) => {
-            onRenameMap(editing.id, fields.name);
-            onUpdateTree(editing.id, tree => ({
-              ...tree,
-              description: fields.description,
-              deadline: fields.deadline,
-              priority: fields.priority,
-              colorIdx: fields.colorIdx,
-            }));
+            onSaveMapDetails(editing.id, fields);
             closeEditing();
           }}
           onDelete={() => { onDeleteMap(editing.id); closeEditing(); }}

@@ -2,7 +2,6 @@
   "appId": "app.mindes",
   "appName": "Mindes",
   "webDir": "dist",
-  "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
   },

@@ -21,6 +21,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
   };
 
   const handleApply = () => {
+    if (saving) return;
     const url = urlInput.trim();
     if (!url) return;
     wrap(() => saveBgUrl(uid, url));
@@ -104,7 +105,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
               placeholder={t("bg.placeholder")}
               value={urlInput}
               onChange={e => setUrlInput(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleApply()}
+              onKeyDown={e => { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) handleApply(); }}
               style={{
                 width: "100%", padding: "11px 13px", borderRadius: 10,
                 border: `1.5px solid ${theme.surfaceBorder}`,

@@ -3,7 +3,7 @@
 // даже если приложение закрыто). В браузере — Notification API через
 // setTimeout (работает пока вкладка открыта).
 
-import { isNative } from "./platform";
+import { isNative } from "./platform.js";
 
 // Стабильный numeric id из строкового taskId (нужен Capacitor LocalNotifications).
 function hashId(s) {
@@ -72,9 +72,10 @@ export async function scheduleReminder({ taskId, title, body, fireAt }) {
     }
   } else {
     // Web: setTimeout не справится с очень большими задержками.
-    if (delay > SAFE_MAX_TIMEOUT) return;
     const old = webTimers.get(taskId);
     if (old) clearTimeout(old);
+    webTimers.delete(taskId);
+    if (delay > SAFE_MAX_TIMEOUT) return;
     const timer = setTimeout(() => {
       try {
         if (typeof window !== "undefined" && "Notification" in window

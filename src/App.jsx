@@ -6,6 +6,7 @@ import { useTheme, useNodeShape } from "./theme";
 import { useBackground } from "./background";
 import { useWindowWidth } from "./hooks";
 import { collectTasksWithReminders, scheduleReminder, cancelReminder } from "./notifications";
+import { findNode } from "./utils";
 import Login from "./Login";
 import NotFound from "./NotFound";
 import InstallPrompt from "./InstallPrompt";
@@ -18,6 +19,11 @@ const ProjectsHome = lazy(() => import("./ProjectsHome"));
 
 // Зарезервированные пути (не являются project ID)
 const RESERVED = new Set(["archive", "immediate", "notfound"]);
+
+function decodeRoutePart(part) {
+  try { return decodeURIComponent(part); }
+  catch { return null; }
+}
 
 // ── URL-роутер ──────────────────────────────────────────────────────────────
 function useRouter() {
@@ -75,7 +81,7 @@ export default function App() {
       const tasks = collectTasksWithReminders(m.tree);
       for (const t of tasks) {
         const fireAt = new Date(new Date(t.deadline).getTime() - t.remindBefore * 60_000);
-        if (fireAt.getTime() <= Date.now()) continue;
+        if (!Number.isFinite(fireAt.getTime()) || fireAt.getTime() <= Date.now()) continue;
         nextIds.add(t.id);
         scheduleReminder({
           taskId: t.id, title: t.text || "Задача",
@@ -107,10 +113,10 @@ export default function App() {
     ? path.match(/^\/([^/]+)$/)
     : null;
 
-  const routePid = taskPathMatch ? decodeURIComponent(taskPathMatch[1])
-                 : mapPathMatch  ? decodeURIComponent(mapPathMatch[1])
+  const routePid = taskPathMatch ? decodeRoutePart(taskPathMatch[1])
+                 : mapPathMatch  ? decodeRoutePart(mapPathMatch[1])
                  : null;
-  const routeTid = taskPathMatch ? decodeURIComponent(taskPathMatch[2]) : null;
+  const routeTid = taskPathMatch ? decodeRoutePart(taskPathMatch[2]) : null;
 
   // Показываем Mindmap только если pid — не зарезервированное слово
   const showMindmap = !!routePid && !RESERVED.has(routePid);
@@ -118,14 +124,19 @@ export default function App() {
   // 404 — путь не подходит ни под один известный шаблон
   const isHome    = path === "/";
   const is404     = path === "/notfound";
-  const show404   = !isHome && !isArchive && !isImmediate && !taskPathMatch && !mapPathMatch && !is404;
+  const routeMap = routePid ? sync.maps.find(m => m.id === routePid) : null;
+  const invalidMapRoute = (taskPathMatch || mapPathMatch) &&
+    (!routePid || RESERVED.has(routePid) || (taskPathMatch && !routeTid) ||
+      (!sync.loading && (!routeMap || (routeTid && !findNode(routeMap.tree, routeTid)))));
+  const show404 = !is404 && (invalidMapRoute ||
+    (!isHome && !isArchive && !isImmediate && !taskPathMatch && !mapPathMatch));
 
   // Синхронизируем activeMapId с маршрутом
   useEffect(() => {
-    if (routePid && sync.maps.length && sync.activeMapId !== routePid) {
+    if (routeMap && !invalidMapRoute && sync.activeMapId !== routePid) {
       sync.selectMap(routePid);
     }
-  }, [routePid, sync.maps.length]); // eslint-disable-line
+  }, [routePid, routeMap, invalidMapRoute, sync.activeMapId]); // eslint-disable-line
 
   const openMap = useCallback((mapId) => {
     push(`/${encodeURIComponent(mapId)}`);
@@ -158,7 +169,7 @@ export default function App() {
   if (!user)        return <><Login theme={theme} themeName={themeApi.name} onToggleTheme={themeApi.toggle} /><InstallPrompt theme={theme} /></>;
   if (sync.loading) return splash(t("app.syncing"));
 
-  if (show404) { history.replaceState({}, "", "/notfound"); return <NotFound theme={theme} onGoHome={goHome} />; }
+  if (show404) return <NotFound theme={theme} onGoHome={goHome} />;
   if (is404)   return <NotFound theme={theme} onGoHome={goHome} />;
 
   const bgLayer = bgUrl ? (
@@ -169,6 +180,15 @@ export default function App() {
       backgroundAttachment: "fixed",
       pointerEvents: "none",
     }} />
+  ) : null;
+
+  const syncErrorBanner = sync.error ? (
+    <div role="alert" title={sync.error.message} style={{
+      position: "fixed", top: "calc(12px + env(safe-area-inset-top))", left: "50%",
+      transform: "translateX(-50%)", zIndex: 1000, maxWidth: "min(92vw, 540px)",
+      padding: "10px 14px", borderRadius: 10, background: "#9F2424", color: "#fff",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.25)", fontSize: 13,
+    }}>{t("sync.saveError")}</div>
   ) : null;
 
   const bgPanel = showBgPanel && user ? (
@@ -195,7 +215,7 @@ export default function App() {
           taskId={routeTid}
           onSelectMap={id => push(`/${encodeURIComponent(id)}`)}
           onAddMap={sync.addMap} onDeleteMap={sync.deleteMap}
-          onRenameMap={sync.renameMap} onUpdateTree={sync.updateTree}
+          onUpdateTree={sync.updateTree}
           onSignOut={signOut} onGoHome={goHome}
           onNavigateTask={navigateTask}
           onNavigateMap={navigateMap}
@@ -205,6 +225,7 @@ export default function App() {
           onStartOnboarding={startOnboarding}
         />
         {bgPanel}
+        {syncErrorBanner}
         <InstallPrompt theme={theme} />
       </Suspense>
     );
@@ -219,7 +240,7 @@ export default function App() {
         theme={theme} themeName={themeApi.name} onToggleTheme={themeApi.toggle}
         onOpenMap={openMap} onGoHome={goHome}
         onAddMap={sync.addMap} onDeleteMap={sync.deleteMap}
-        onRenameMap={sync.renameMap} onUpdateTree={sync.updateTree}
+        onSaveMapDetails={sync.saveMapDetails} onUpdateTree={sync.updateTree}
         user={user} onSignOut={signOut}
         onNavigateTask={navigateTask}
         initialOverlay={isArchive ? "archive" : isImmediate ? "today" : null}
@@ -230,6 +251,7 @@ export default function App() {
         onStartOnboarding={startOnboarding}
       />
       {bgPanel}
+      {syncErrorBanner}
       <InstallPrompt theme={theme} />
     </Suspense>
   );

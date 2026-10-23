@@ -154,6 +154,11 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
   }, [node.id]);
 
   const save = (f, v) => setTree(t => updateNode(t, node.id, n => ({ ...n, [f]: v })));
+  const saveReminderOffset = (hours, minutes) => {
+    const h = Number.isFinite(hours) ? hours : 0;
+    const m = Number.isFinite(minutes) ? minutes : 0;
+    save("remindBefore", h * 60 + m || 1);
+  };
 
   const toggleDone = () => {
     // Повторяющаяся задача: при выполнении переносим срок на следующий цикл
@@ -172,7 +177,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
   };
   const addCheck = () => {
     if (!newItem.trim()) return;
-    setTree(t => updateNode(t, node.id, n => ({ ...n, checklist: [...(n.checklist || []), { id: genId(), text: newItem.trim(), done: false }] })));
+    setTree(t => updateNode(t, node.id, n => ({ ...n, checklist: [...(n.checklist || []), { id: genId(), text: newItem, done: false }] })));
     setNewItem("");
   };
   const toggleCheck = cid => setTree(t => updateNode(t, node.id, n => ({ ...n, checklist: (n.checklist || []).map(c => c.id === cid ? { ...c, done: !c.done } : c) })));
@@ -281,14 +286,18 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
           onInput={e => {
             e.target.style.height = "auto";
             e.target.style.height = e.target.scrollHeight + "px";
+            if (!e.nativeEvent.isComposing && e.target.value.trim() && e.target.value !== node.text) {
+              save("text", e.target.value);
+            }
           }}
+          onCompositionEnd={e => { if (e.target.value.trim() && e.target.value !== node.text) save("text", e.target.value); }}
           onBlur={e => {
-            const v = e.target.value.trim();
-            if (v && v !== node.text) save("text", v);
-            else if (!v) e.target.value = node.text; // не даём очистить название
+            const v = e.target.value;
+            if (v.trim() && v !== node.text) save("text", v);
+            else if (!v.trim()) e.target.value = node.text; // не даём очистить название
           }}
           onKeyDown={e => {
-            if (e.key === "Enter" && !e.shiftKey) {
+            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
               e.preventDefault();
               e.target.blur();
             }
@@ -355,9 +364,9 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
               </label>
               {remindEnabled && (
                 <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
-                  <input type="number" min="0" max="999" value={Number.isFinite(remindH) ? remindH : ""} onChange={e => { const v = e.target.value; if (v === "") setRemindH(NaN); else setRemindH(Math.max(0, parseInt(v, 10))); }} onBlur={() => { const h = Number.isFinite(remindH) ? remindH : 0; const m = Number.isFinite(remindM) ? remindM : 0; setRemindH(h); save("remindBefore", h * 60 + m || 1); }} className="pi" style={{ width: 72, textAlign: "center" }} />
+                  <input type="number" min="0" max="999" value={Number.isFinite(remindH) ? remindH : ""} onChange={e => { const h = e.target.value === "" ? NaN : Math.min(999, Math.max(0, parseInt(e.target.value, 10))); setRemindH(h); if (Number.isFinite(h)) saveReminderOffset(h, remindM); }} onBlur={() => { const h = Number.isFinite(remindH) ? remindH : 0; setRemindH(h); saveReminderOffset(h, remindM); }} className="pi" style={{ width: 72, textAlign: "center" }} />
                   <span style={{ fontSize: 12, color: theme.textDim }}>{t("remind.hours")}</span>
-                  <input type="number" min="0" max="59" value={Number.isFinite(remindM) ? remindM : ""} onChange={e => { const v = e.target.value; if (v === "") setRemindM(NaN); else setRemindM(Math.max(0, Math.min(59, parseInt(v, 10)))); }} onBlur={() => { const h = Number.isFinite(remindH) ? remindH : 0; const m = Number.isFinite(remindM) ? remindM : 0; setRemindM(m); save("remindBefore", h * 60 + m || 1); }} className="pi" style={{ width: 72, textAlign: "center" }} />
+                  <input type="number" min="0" max="59" value={Number.isFinite(remindM) ? remindM : ""} onChange={e => { const m = e.target.value === "" ? NaN : Math.min(59, Math.max(0, parseInt(e.target.value, 10))); setRemindM(m); if (Number.isFinite(m)) saveReminderOffset(remindH, m); }} onBlur={() => { const m = Number.isFinite(remindM) ? remindM : 0; setRemindM(m); saveReminderOffset(remindH, m); }} className="pi" style={{ width: 72, textAlign: "center" }} />
                   <span style={{ fontSize: 12, color: theme.textDim }}>{t("remind.minutesBefore")}</span>
                 </div>
               )}
@@ -379,7 +388,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
               const active = repeat?.type === opt.key || (opt.key === null && !repeat);
               return (
                 <button key={String(opt.key)} onClick={() => {
-                  const val = opt.key ? { type: opt.key, every: opt.key === "custom" ? repeatEvery : undefined } : null;
+                  const val = opt.key ? { type: opt.key, every: opt.key === "custom" ? (Number.isFinite(repeatEvery) ? repeatEvery : 1) : undefined } : null;
                   setRepeat(val);
                   save("repeat", val);
                 }} style={{
@@ -398,13 +407,20 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
           {repeat?.type === "custom" && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
               <span style={{ fontSize: 13, color: theme.textDim }}>{t("repeat.every")}</span>
-              <input type="number" min="1" max="365" value={repeatEvery}
+              <input type="number" min="1" max="365" value={Number.isFinite(repeatEvery) ? repeatEvery : ""}
                 onChange={e => {
-                  const v = Math.max(1, parseInt(e.target.value, 10) || 1);
+                  const v = e.target.value === "" ? NaN : Math.min(365, Math.max(1, parseInt(e.target.value, 10)));
                   setRepeatEvery(v);
+                  if (Number.isFinite(v)) {
+                    const val = { type: "custom", every: v };
+                    setRepeat(val);
+                    save("repeat", val);
+                  }
                 }}
                 onBlur={() => {
-                  const val = { type: "custom", every: repeatEvery };
+                  const every = Number.isFinite(repeatEvery) ? repeatEvery : 1;
+                  setRepeatEvery(every);
+                  const val = { type: "custom", every };
                   setRepeat(val);
                   save("repeat", val);
                 }}
@@ -428,7 +444,11 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
             onInput={e => {
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
+              if (!e.nativeEvent.isComposing && e.target.value !== (node.description || "")) {
+                save("description", e.target.value);
+              }
             }}
+            onCompositionEnd={e => { if (e.target.value !== (node.description || "")) save("description", e.target.value); }}
             onBlur={e => {
               const v = e.target.value;
               if (v !== (node.description || "")) save("description", v);
@@ -458,7 +478,7 @@ function SidePanel({ node, tree, setTree, onClose, onDelete, theme, themeName, i
             ))}
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <input className="pi" value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === "Enter" && addCheck()} placeholder={t("checklist.placeholder")} style={{ flex: 1 }} />
+            <input className="pi" value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) addCheck(); }} placeholder={t("checklist.placeholder")} style={{ flex: 1 }} />
             <button onClick={addCheck} style={{ background: branchColor.bg, border: "none", borderRadius: 8, padding: "0 14px", color: "#fff", fontWeight: 700, fontSize: 18, cursor: "pointer" }}>+</button>
           </div>
         </div>
@@ -570,7 +590,7 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
       onMouseLeave={e => (e.currentTarget.style.opacity = ad ? "0.48" : "1")}
     >
       {/* Title */}
-      <div style={{
+      <div title={node.text} style={{
         fontWeight: isCenter ? 700 : level === 1 ? 650 : 600,
         fontSize: isCenter ? 18 : level === 1 ? 15 : 13,
         lineHeight: 1.3,
@@ -680,7 +700,7 @@ function ChildColumn({ child, childIdx, onNavigate, onNavigateGc, onEdit, theme,
 
 /* ── Main ── */
 export default function Mindmap({
-  maps, activeMapId, onSelectMap, onAddMap, onDeleteMap, onRenameMap,
+  maps, activeMapId, onSelectMap, onAddMap, onDeleteMap,
   onUpdateTree, user, onSignOut, theme: themeProp, themeName, onToggleTheme,
   nodeShape = "circle", onToggleShape = () => {}, onGoHome,
   taskId, onNavigateTask, onNavigateMap,

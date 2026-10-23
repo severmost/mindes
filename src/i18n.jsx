@@ -69,6 +69,7 @@ const translations = {
     "common.color":       "Color",
     "common.no":          "None",
     "common.error":       "Error",
+    "sync.saveError":    "Changes could not be saved to the cloud. Check your connection and account access.",
 
     "priority.none":   "No priority",
     "priority.low":    "Low",
@@ -218,6 +219,7 @@ const translations = {
     "common.color":       "Цвет",
     "common.no":          "Нет",
     "common.error":       "Ошибка",
+    "sync.saveError":    "Не удалось сохранить изменения в облаке. Проверьте соединение и доступ к аккаунту.",
 
     "priority.none":   "Без приоритета",
     "priority.low":    "Низкий",
@@ -367,6 +369,7 @@ const translations = {
     "common.color":       "颜色",
     "common.no":          "无",
     "common.error":       "错误",
+    "sync.saveError":    "无法将更改保存到云端。请检查网络连接和账号权限。",
 
     "priority.none":   "无优先级",
     "priority.low":    "低",
@@ -516,6 +519,7 @@ const translations = {
     "common.color":       "Color",
     "common.no":          "Ninguno",
     "common.error":       "Error",
+    "sync.saveError":    "No se pudieron guardar los cambios en la nube. Comprueba la conexión y el acceso a la cuenta.",
 
     "priority.none":   "Sin prioridad",
     "priority.low":    "Baja",
@@ -665,6 +669,7 @@ const translations = {
     "common.color":       "रंग",
     "common.no":          "कोई नहीं",
     "common.error":       "त्रुटि",
+    "sync.saveError":    "बदलाव क्लाउड में सहेजे नहीं जा सके। कनेक्शन और खाते की पहुँच जाँचें।",
 
     "priority.none":   "कोई प्राथमिकता नहीं",
     "priority.low":    "निम्न",
@@ -814,6 +819,7 @@ const translations = {
     "common.color":       "Cor",
     "common.no":          "Nenhum",
     "common.error":       "Erro",
+    "sync.saveError":    "Não foi possível salvar as alterações na nuvem. Verifique a conexão e o acesso à conta.",
 
     "priority.none":   "Sem prioridade",
     "priority.low":    "Baixa",
@@ -963,6 +969,7 @@ const translations = {
     "common.color":       "Couleur",
     "common.no":          "Aucun",
     "common.error":       "Erreur",
+    "sync.saveError":    "Impossible d’enregistrer les modifications dans le cloud. Vérifiez la connexion et l’accès au compte.",
 
     "priority.none":   "Aucune priorité",
     "priority.low":    "Faible",
@@ -1112,6 +1119,7 @@ const translations = {
     "common.color":       "Түс",
     "common.no":          "Жоқ",
     "common.error":       "Қате",
+    "sync.saveError":    "Өзгерістерді бұлтқа сақтау мүмкін болмады. Байланысты және аккаунтқа қолжетімділікті тексеріңіз.",
 
     "priority.none":   "Басымдық жоқ",
     "priority.low":    "Төмен",

@@ -20,20 +20,24 @@ export async function clearBg(uid) {
 
 // Реактивный хук: слушает настройки пользователя из Firestore.
 export function useBackground(uid) {
-  const [bgUrl,     setBgUrl]     = useState(null);
-  const [bgType,    setBgType]    = useState(null);
-  const [bgLoading, setBgLoading] = useState(true);
+  const [state, setState] = useState({ uid: null, bgUrl: null, bgType: null, bgLoading: true });
 
   useEffect(() => {
-    if (!uid) { setBgLoading(false); return; }
+    if (!uid) {
+      setState({ uid: null, bgUrl: null, bgType: null, bgLoading: false });
+      return;
+    }
+    setState({ uid, bgUrl: null, bgType: null, bgLoading: true });
     const unsub = onSnapshot(settingsDoc(uid), snap => {
       const data = snap.data() || {};
-      setBgUrl(data.bgUrl   || null);
-      setBgType(data.bgType || null);
-      setBgLoading(false);
-    }, () => { setBgLoading(false); });
+      setState({ uid, bgUrl: data.bgUrl || null, bgType: data.bgType || null, bgLoading: false });
+    }, () => {
+      setState({ uid, bgUrl: null, bgType: null, bgLoading: false });
+    });
     return unsub;
   }, [uid]);
 
-  return { bgUrl, bgType, bgLoading };
+  return state.uid === uid
+    ? { bgUrl: state.bgUrl, bgType: state.bgType, bgLoading: state.bgLoading }
+    : { bgUrl: null, bgType: null, bgLoading: !!uid };
 }
