@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { signInWithGoogle } from "./auth";
 import { themes } from "./theme";
-import { useLocale } from "./i18n.jsx";
+import { LANGS, useLocale } from "./i18n.jsx";
 import { MoonIcon, SunIcon } from "./ui";
 import { BRAND_COLOR } from "./utils";
 
@@ -79,7 +79,7 @@ function GoogleLogo() {
 
 /* ════════════════════════════════════════════════════════════════ */
 export default function Login({ theme = themes.dark, themeName, onToggleTheme }) {
-  const { t } = useLocale();
+  const { t, locale, setLocale } = useLocale();
   const [busy, setBusy]   = useState(false);
   const [error, setError] = useState(null);
   const isDark = theme.name === "dark";
@@ -167,7 +167,7 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
       {/* ── Top bar ── */}
       <div style={{
         position: "fixed", top: 0, left: 0, right: 0,
-        padding: "24px 40px",
+        padding: "24px clamp(16px, 4vw, 40px)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         zIndex: 10,
         paddingTop: "calc(24px + env(safe-area-inset-top))",
@@ -176,6 +176,28 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
           <img src="/icon.svg" alt="Mindes" style={{ width: 28, height: 28, borderRadius: 7 }} />
           <span>Mindes</span>
         </div>
+        <select
+          aria-label={t("menu.language")}
+          title={t("menu.language")}
+          value={locale}
+          onChange={event => setLocale(event.target.value)}
+          style={{
+            maxWidth: "min(48vw, 170px)",
+            padding: "9px 10px",
+            borderRadius: 12,
+            border: `1px solid ${T.toggleBorder}`,
+            background: isDark ? "#241d43" : "#ffffff",
+            color: T.ink,
+            fontFamily: "'Geist', 'Inter', system-ui, sans-serif",
+            fontSize: 13,
+            fontWeight: 500,
+            cursor: "pointer",
+          }}
+        >
+          {Object.entries(LANGS).map(([code, info]) => (
+            <option key={code} value={code}>{info.flag} {info.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* ── Main grid ── */}
