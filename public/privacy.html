@@ -42,6 +42,18 @@
       gap: 10px;
       margin-bottom: 40px;
     }
+    .topbar { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+    #privacy-language {
+      max-width: 48vw;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
     .logo-mark {
       width: 36px; height: 36px; border-radius: 10px;
       background: var(--acc);
@@ -91,98 +103,83 @@
 <body>
 <div class="wrap">
 
-  <div class="logo">
-    <div class="logo-mark">M</div>
-    <div class="logo-name">Mindes</div>
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">M</div>
+      <div class="logo-name">Mindes</div>
+    </div>
+    <select id="privacy-language" aria-label="Язык"></select>
   </div>
 
-  <h1>Политика конфиденциальности</h1>
-  <div class="updated">Последнее обновление: 23 октября 2026 г.</div>
+  <h1 data-i18n="title">Политика конфиденциальности</h1>
+  <div class="updated" data-i18n="updated">Последнее обновление: 23 октября 2026 г.</div>
 
   <div class="card">
-    <h2>Что такое Mindes</h2>
-    <p>Mindes — приложение для управления задачами и проектами. Мы уважаем вашу
-    приватность и собираем только те данные, которые необходимы для работы сервиса.</p>
+    <h2 data-i18n="aboutTitle">Что такое Mindes</h2>
+    <p data-i18n="aboutBody">Mindes — приложение для управления задачами и проектами. Мы уважаем вашу приватность и собираем только те данные, которые необходимы для работы сервиса.</p>
   </div>
 
   <div class="card">
-    <h2>Какие данные мы собираем</h2>
+    <h2 data-i18n="dataTitle">Какие данные мы собираем</h2>
     <ul>
-      <li><strong>Аккаунт Google</strong> — имя и адрес электронной почты, которые вы
-      предоставляете при входе через Google Sign-In. Используются только для
-      идентификации вашей учётной записи.</li>
-      <li><strong>Содержимое задач</strong> — названия проектов, задачи, описания,
-      сроки и прочие данные, которые вы вводите в приложение. Хранятся в вашем
-      персональном разделе базы данных Firebase Firestore.</li>
-      <li><strong>Фоновые изображения</strong> — в Firestore сохраняется ссылка на
-      выбранное вами изображение. Само изображение загружается с сайта по этой ссылке.</li>
-      <li><strong>Локальные настройки</strong> — тема оформления и состояние
-      обучения сохраняются только на вашем устройстве (localStorage).</li>
+      <li data-i18n="dataGoogle">Аккаунт Google — имя и адрес электронной почты, которые вы предоставляете при входе через Google Sign-In. Используются только для идентификации вашей учётной записи.</li>
+      <li data-i18n="dataTasks">Содержимое задач — названия проектов, задачи, описания, сроки и прочие данные, которые вы вводите в приложение. Хранятся в вашем персональном разделе базы данных Firebase Firestore.</li>
+      <li data-i18n="dataBackground">Фоновые изображения — в Firestore сохраняется ссылка на выбранное вами изображение. Само изображение загружается с сайта по этой ссылке.</li>
+      <li data-i18n="dataLocal">Локальные настройки — тема оформления, язык и состояние обучения сохраняются только на вашем устройстве (localStorage).</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2>Как мы используем данные</h2>
+    <h2 data-i18n="useTitle">Как мы используем данные</h2>
     <ul>
-      <li>Для отображения ваших проектов и задач на всех устройствах.</li>
-      <li>Для синхронизации данных между устройствами в реальном времени.</li>
-      <li>Для отправки локальных уведомлений-напоминаний о задачах
-      (только если вы это разрешили).</li>
+      <li data-i18n="useDisplay">Для отображения ваших проектов и задач на всех устройствах.</li>
+      <li data-i18n="useSync">Для синхронизации данных между устройствами в реальном времени.</li>
+      <li data-i18n="useReminders">Для отправки локальных уведомлений-напоминаний о задачах (только если вы это разрешили).</li>
     </ul>
-    <p>Мы <strong>не продаём</strong> ваши данные третьим лицам, не используем их
-    для рекламы и не передаём без вашего явного согласия.</p>
+    <p data-i18n="useNoSale">Мы не продаём ваши данные третьим лицам, не используем их для рекламы и не передаём без вашего явного согласия.</p>
   </div>
 
   <div class="card">
-    <h2>Сторонние сервисы</h2>
-    <p>Приложение использует инфраструктуру Google:</p>
+    <h2 data-i18n="servicesTitle">Сторонние сервисы</h2>
+    <p data-i18n="servicesIntro">Приложение использует инфраструктуру Google:</p>
     <ul>
-      <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Authentication</a> — вход через Google.</li>
-      <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Firestore</a> — облачное хранение задач и ссылок на фоновые изображения.</li>
+      <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Authentication</a><span data-i18n="servicesAuth"> — вход через Google.</span></li>
+      <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Firestore</a><span data-i18n="servicesFirestore"> — облачное хранение задач и ссылок на фоновые изображения.</span></li>
     </ul>
-    <p>На эти сервисы распространяется
-    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Политика конфиденциальности Google</a>.</p>
+    <p><span data-i18n="servicesPolicyIntro">На эти сервисы распространяется: </span><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-i18n="servicesPolicyLink">Политика конфиденциальности Google</a></p>
   </div>
 
   <div class="card">
-    <h2>Хранение и безопасность</h2>
-    <p>Данные хранятся на серверах Google (Firebase) с разграничением доступа:
-    каждый пользователь может читать и изменять только свои данные.
-    Передача данных защищена протоколом HTTPS.</p>
+    <h2 data-i18n="securityTitle">Хранение и безопасность</h2>
+    <p data-i18n="securityBody">Данные хранятся на серверах Google (Firebase) с разграничением доступа: каждый пользователь может читать и изменять только свои данные. Передача данных защищена протоколом HTTPS.</p>
   </div>
 
   <div class="card">
-    <h2>Ваши права</h2>
+    <h2 data-i18n="rightsTitle">Ваши права</h2>
     <ul>
-      <li><strong>Удаление данных</strong> — вы можете удалить все свои проекты
-      внутри приложения. Для полного удаления аккаунта напишите нам.</li>
-      <li><strong>Экспорт</strong> — данные хранятся в вашем аккаунте Firebase
-      и доступны для экспорта по запросу.</li>
+      <li data-i18n="rightsDelete">Удаление данных — вы можете удалить все свои проекты внутри приложения. Для полного удаления аккаунта напишите нам.</li>
+      <li data-i18n="rightsExport">Экспорт — данные хранятся в вашем аккаунте Firebase и доступны для экспорта по запросу.</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2>Дети</h2>
-    <p>Приложение не предназначено для детей младше 13 лет. Мы осознанно
-    не собираем данные несовершеннолетних.</p>
+    <h2 data-i18n="childrenTitle">Дети</h2>
+    <p data-i18n="childrenBody">Приложение не предназначено для детей младше 13 лет. Мы осознанно не собираем данные несовершеннолетних.</p>
   </div>
 
   <div class="card">
-    <h2>Изменения политики</h2>
-    <p>При существенных изменениях мы обновим дату вверху страницы.
-    Продолжение использования приложения после изменений означает согласие
-    с обновлённой политикой.</p>
+    <h2 data-i18n="changesTitle">Изменения политики</h2>
+    <p data-i18n="changesBody">При существенных изменениях мы обновим дату вверху страницы. Продолжение использования приложения после изменений означает согласие с обновлённой политикой.</p>
   </div>
 
   <div class="card">
-    <h2>Контакт</h2>
-    <p>По вопросам конфиденциальности пишите: <a href="mailto:support@mindes.app">support@mindes.app</a></p>
+    <h2 data-i18n="contactTitle">Контакт</h2>
+    <p><span data-i18n="contactIntro">По вопросам конфиденциальности пишите: </span><a href="mailto:support@mindes.app">support@mindes.app</a></p>
   </div>
 
-  <div class="footer">
-    © 2025 Mindes. Все права защищены.
-  </div>
+  <div class="footer" data-i18n="footer">© 2025 Mindes. Все права защищены.</div>
 
 </div>
+<script type="module" src="/privacy-i18n.js"></script>
 </body>
 </html>

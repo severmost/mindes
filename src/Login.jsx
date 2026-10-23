@@ -394,7 +394,7 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
 
             {/* Privacy policy link */}
             <p style={{ fontSize: 11, color: T.ink3, textAlign: "center", margin: "10px 0 0" }}>
-              <a href="/privacy.html" target="_blank" rel="noopener noreferrer"
+              <a href={`/privacy.html?lang=${locale}`} target="_blank" rel="noopener noreferrer"
                 style={{ color: T.ink3, textDecoration: "underline", textUnderlineOffset: 2 }}>
                 {t("login.privacy")}
               </a>

@@ -1453,6 +1453,16 @@ export function LocaleProvider({ children }) {
     document.documentElement.lang = locale;
   }, [locale]);
 
+  useEffect(() => {
+    const onStorage = event => {
+      if (event.key === LS_KEY && SUPPORTED.includes(event.newValue)) {
+        setLocaleState(event.newValue);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   const setLocale = useCallback((code) => {
     if (!SUPPORTED.includes(code)) return;
     localStorage.setItem(LS_KEY, code);

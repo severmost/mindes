@@ -1,6 +1,6 @@
 // Service Worker — Mindes PWA
-const CACHE = "mindes-v5";
-const SHELL = ["/", "/index.html", "/privacy.html"];
+const CACHE = "mindes-v6";
+const SHELL = ["/", "/index.html", "/privacy.html", "/privacy-i18n.js"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();
