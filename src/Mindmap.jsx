@@ -502,7 +502,7 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
   const ad = isAllDone(node);
   const { total, done } = countTasks(node);
   const { total: dkTotal, done: dkDone } = countDirectKids(node);
-  const dl = formatDeadline(node.deadline);
+  const dl = formatDeadline(node.deadline, t);
 
   const longPressRef = useRef(null);
   const longPressFiredRef = useRef(false);
@@ -656,6 +656,7 @@ function NodeCard({ node, colorIdx, level, onNavigate, onEdit, theme, isNew, sin
 
 // ── Child column: child card + grandchildren ──
 function ChildColumn({ child, childIdx, onNavigate, onNavigateGc, onEdit, theme, newTaskIds, onArchive, onDone }) {
+  const { t } = useLocale();
   const [showAll, setShowAll] = useState(false);
   const colorIdx = getNodeColor(child, undefined, childIdx);
   const color = COLORS[colorIdx % COLORS.length];
@@ -688,7 +689,7 @@ function ChildColumn({ child, childIdx, onNavigate, onNavigateGc, onEdit, theme,
             {!showAll && visGC.length > MAX_GC && (
               <div onClick={() => setShowAll(true)}
                 style={{ textAlign: "center", fontSize: 11, color: theme.textMuted, cursor: "pointer", padding: "5px 0", letterSpacing: 0.5 }}>
-                ··· ещё {visGC.length - MAX_GC}
+                {t("task.more", { count: visGC.length - MAX_GC })}
               </div>
             )}
           </div>
@@ -1061,7 +1062,7 @@ export default function Mindmap({
 
       {/* Overlay: Today */}
       {overlayMode === "today" && (() => {
-        const items = collectByDeadline(maps);
+        const items = collectByDeadline(maps, new Date(), t("common.untitled"));
         const overdue = items.filter(i => i.bucket === "overdue");
         const today = items.filter(i => i.bucket === "today");
         const week = items.filter(i => i.bucket === "week");
@@ -1072,19 +1073,19 @@ export default function Mindmap({
             </div>
             {list.length === 0
               ? <div style={{ color: theme.textDim, fontSize: 13, padding: "8px 0" }}>—</div>
-              : list.map(t => {
-                const co = COLORS[(t.colorIdx ?? 0) % COLORS.length];
-                const dl = formatDeadline(t.deadline);
+              : list.map(task => {
+                const co = COLORS[(task.colorIdx ?? 0) % COLORS.length];
+                const dl = formatDeadline(task.deadline, t);
                 return (
-                  <div key={`${t.mapId}/${t.id}`} onClick={() => goToTask(t.mapId, t.id)}
+                  <div key={`${task.mapId}/${task.id}`} onClick={() => goToTask(task.mapId, task.id)}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 4, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, borderRadius: 10, cursor: "pointer" }}
                     onMouseEnter={e => e.currentTarget.style.background = theme.surfaceBgHover}
                     onMouseLeave={e => e.currentTarget.style.background = theme.surfaceBg}>
                     <div style={{ width: 8, height: 36, borderRadius: 4, background: co.bg, flexShrink: 0 }} />
-                    <PriorityDot priority={t.priority} />
+                    <PriorityDot priority={task.priority} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.text}</div>
-                      <div style={{ fontSize: 11, color: theme.textDim, marginTop: 2 }}>{t.mapName}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{task.text}</div>
+                      <div style={{ fontSize: 11, color: theme.textDim, marginTop: 2 }}>{task.mapName}</div>
                     </div>
                     {dl && <div style={{ fontSize: 12, fontWeight: 600, color: dl.color || theme.textDim, flexShrink: 0 }}>{dl.text}</div>}
                   </div>
@@ -1103,7 +1104,7 @@ export default function Mindmap({
 
       {/* Overlay: Archive */}
       {overlayMode === "archive" && (() => {
-        const items = collectArchived(maps);
+        const items = collectArchived(maps, t("common.untitled"));
         return (
           <AppOverlay title={t("archive.title")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0

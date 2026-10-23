@@ -1,5 +1,5 @@
 // Service Worker — Mindes PWA
-const CACHE = "mindes-v3";
+const CACHE = "mindes-v4";
 const SHELL = ["/", "/index.html"];
 
 self.addEventListener("install", e => {

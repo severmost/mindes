@@ -19,44 +19,44 @@ const CARD_COLORS = {
 const SHOWCASE_CARDS = [
   {
     cls: "c1", accent: CARD_COLORS.purple, progress: 24,
-    title: "Частые дела",
-    body: "Покупки, повседневные задачи",
+    titleKey: "login.card1.title",
+    bodyKey: "login.card1.body",
     meta: "7 / 29", metaDot: true,
     style: { top: 30,  left: 0 },   delay: "-0.4s",
   },
   {
     cls: "c2", accent: CARD_COLORS.orange, progress: 0,
-    title: "Мои цели",
-    titleSub: "долгосрочные",
-    body: "Идеи, которые я должен реализовать",
+    titleKey: "login.card2.title",
+    titleSubKey: "login.card2.sub",
+    bodyKey: "login.card2.body",
     meta: "0 / 9",
     style: { top: 80,  left: 230 }, delay: "-1.2s",
   },
   {
     cls: "c3", accent: CARD_COLORS.yellow, progress: 0,
-    title: "Здоровье",
-    body: "Записи к врачам, тренировки, походы",
-    meta: "0 / 1", metaRight: { text: "просрочено", color: CARD_COLORS.red },
+    titleKey: "login.card3.title",
+    bodyKey: "login.card3.body",
+    meta: "0 / 1", metaRight: { key: "deadline.overdue", color: CARD_COLORS.red },
     style: { top: 60,  left: 460 }, delay: "-2.0s",
   },
   {
     cls: "c4", accent: CARD_COLORS.blue, progress: 0,
-    title: "Покупки на неделю",
-    body: "Овощи, фрукты, хлеб",
-    meta: "0 / 1", metaRight: { text: "сегодня 18:09", color: CARD_COLORS.orange },
+    titleKey: "login.card4.title",
+    bodyKey: "login.card4.body",
+    meta: "0 / 1", metaRight: { key: "deadline.todayAt", vars: { time: "18:09" }, color: CARD_COLORS.orange },
     style: { top: 280, left: 100 }, delay: "-2.8s",
   },
   {
     cls: "c5", accent: CARD_COLORS.red, progress: 0,
-    title: "Ремонт балкона",
-    body: "Замер, материалы, мастер",
-    meta: "0 / 1", metaRight: { text: "просрочено", color: CARD_COLORS.red },
+    titleKey: "login.card5.title",
+    bodyKey: "login.card5.body",
+    meta: "0 / 1", metaRight: { key: "deadline.overdue", color: CARD_COLORS.red },
     style: { top: 320, left: 340 }, delay: "-3.6s",
   },
   {
     cls: "c6", accent: CARD_COLORS.green, progress: 60,
-    title: "Тренировки",
-    body: "3 раза в неделю, ноги-спина-руки",
+    titleKey: "login.card6.title",
+    bodyKey: "login.card6.body",
     meta: "6 / 10",
     style: { top: 260, left: 560 }, delay: "-4.4s",
   },
@@ -140,7 +140,7 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
     } catch (e) {
       const code = e?.code || "";
       if (!(code.includes("popup-closed") || code.includes("cancelled"))) {
-        setError(e?.message || "Не удалось войти");
+        setError(t("login.error"));
       }
     } finally {
       setBusy(false);
@@ -265,18 +265,18 @@ export default function Login({ theme = themes.dark, themeName, onToggleTheme })
                 {/* left accent stripe */}
                 <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: card.accent, borderRadius: "3px 0 0 3px" }} />
                 <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.25, marginBottom: 8 }}>
-                  {card.title}
-                  {card.titleSub && <><br/><span style={{ fontWeight: 500, color: T.ink3 }}>{card.titleSub}</span></>}
+                  {t(card.titleKey)}
+                  {card.titleSubKey && <><br/><span style={{ fontWeight: 500, color: T.ink3 }}>{t(card.titleSubKey)}</span></>}
                 </div>
                 <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.45, marginBottom: 16, WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", display: "-webkit-box" }}>
-                  {card.body}
+                  {t(card.bodyKey)}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: T.ink3 }}>
                   <span>
                     {card.metaDot && <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: card.accent, marginRight: 6, verticalAlign: "middle" }} />}
                     {card.meta}
                   </span>
-                  {card.metaRight && <span style={{ color: card.metaRight.color }}>{card.metaRight.text}</span>}
+                  {card.metaRight && <span style={{ color: card.metaRight.color }}>{t(card.metaRight.key, card.metaRight.vars)}</span>}
                 </div>
                 <div style={{ height: 3, background: isDark ? "rgba(255,255,255,0.1)" : T.line, borderRadius: 2, overflow: "hidden", marginTop: 10 }}>
                   <div style={{ height: "100%", width: `${card.progress}%`, background: card.accent, borderRadius: 2 }} />

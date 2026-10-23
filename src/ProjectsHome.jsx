@@ -126,13 +126,14 @@ function ProjectsOverview({ maps, theme, themeName, onOpenMap }) {
 
 // ── Project card ──
 function ProjectCard({ map, colorIdx: fallbackIdx, theme, onOpen, onEdit, isDesktop, isFirst }) {
+  const { t } = useLocale();
   const resolvedIdx = (map.tree?.colorIdx !== undefined && map.tree?.colorIdx !== null)
     ? map.tree.colorIdx : fallbackIdx;
   const c = COLORS[resolvedIdx % COLORS.length];
   const { total, done } = countDirectKids(map.tree);  // только прямые дети
   const { total: totalAll, done: doneAll } = countTasks(map.tree); // для прогресс-бара
   const deadline = map.tree?.deadline || null;
-  const dlFmt = formatDeadline(deadline);
+  const dlFmt = formatDeadline(deadline, t);
   const priority = map.tree?.priority || null;
   const desc = map.tree?.description || "";
 
@@ -259,8 +260,9 @@ function AddCard({ theme, onClick }) {
 
 // ── Deadline task row ──
 function DeadlineRow({ task, mapColorIdx, theme, onNavigateTask }) {
+  const { t } = useLocale();
   const c = COLORS[(mapColorIdx ?? task.colorIdx ?? 0) % COLORS.length];
-  const dl = formatDeadline(task.deadline);
+  const dl = formatDeadline(task.deadline, t);
   return (
     <div
       onClick={() => onNavigateTask?.(task.mapId, task.id)}
@@ -528,7 +530,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
 
   const isDesktop = winW >= 720;
 
-  const deadlineTasks = collectByDeadline(maps);
+  const deadlineTasks = collectByDeadline(maps, new Date(), t("common.untitled"));
   const overdue = deadlineTasks.filter(t => t.bucket === "overdue");
   const today  = deadlineTasks.filter(t => t.bucket === "today");
   const week   = deadlineTasks.filter(t => t.bucket === "week");
@@ -686,7 +688,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
               ? <div style={{ color: theme.textDim, fontSize: 13, padding: "8px 0" }}>—</div>
               : list.map(task => {
                 const co = COLORS[(task.colorIdx ?? 0) % COLORS.length];
-                const dl = formatDeadline(task.deadline);
+                const dl = formatDeadline(task.deadline, t);
                 return (
                   <div key={`${task.mapId}/${task.id}`} onClick={() => { onNavigateTask?.(task.mapId, task.id); closeOverlay(); }}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 4, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, borderRadius: 10, cursor: "pointer" }}
@@ -715,7 +717,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
 
       {/* Overlay: Приоритеты */}
       {overlayMode === "priorities" && (() => {
-        const byPriority = collectByPriority(maps);
+        const byPriority = collectByPriority(maps, t("common.untitled"));
         const sections = [
           { key: "high",   label: t("priority.high"),   color: "#F44336" },
           { key: "medium", label: t("priority.medium"), color: "#FFC107" },
@@ -743,7 +745,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
                       ? <div style={{ color: theme.textDim, fontSize: 13, padding: "6px 0 0 18px" }}>—</div>
                       : list.map(task => {
                         const co = COLORS[(task.colorIdx ?? 0) % COLORS.length];
-                        const dl = task.deadline ? formatDeadline(new Date(task.deadline)) : null;
+                        const dl = task.deadline ? formatDeadline(task.deadline, t) : null;
                         return (
                           <div key={`${task.mapId}/${task.id}`}
                             onClick={() => { onNavigateTask?.(task.mapId, task.id); closeOverlay(); }}
@@ -768,7 +770,7 @@ export default function ProjectsHome({ maps, theme: themeProp, themeName, onTogg
 
       {/* Overlay: Архив */}
       {overlayMode === "archive" && (() => {
-        const items = collectArchived(maps);
+        const items = collectArchived(maps, t("common.untitled"));
         return (
           <AppOverlay title={t("archive.title")} theme={theme} themeName={themeName} bgUrl={bgUrl} onClose={closeOverlay}>
             {items.length === 0

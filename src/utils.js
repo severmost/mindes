@@ -19,9 +19,9 @@ export const COLORS = [
 
 // ── Приоритеты ────────────────────────────────────────────────────────────────
 export const PRIORITY_COLORS = {
-  low:    { bg: "#4CAF50", label: "Низкая" },
-  medium: { bg: "#FFC107", label: "Средняя" },
-  high:   { bg: "#F44336", label: "Высокая" },
+  low:    { bg: "#4CAF50" },
+  medium: { bg: "#FFC107" },
+  high:   { bg: "#F44336" },
 };
 
 // ── Бренд ─────────────────────────────────────────────────────────────────────
@@ -62,20 +62,21 @@ export function collectMapDetailsChanges(original, draft) {
 /**
  * Форматирует дедлайн для отображения в карточках и списках.
  * @param {string|null} iso — ISO-строка дедлайна
+ * @param {(key: string, vars?: object) => string} t — переводчик текущего языка
+ * @param {Date} now — текущее время (можно подменить для проверки)
  * @returns {{ text: string, color: string|null } | null}
  */
-export function formatDeadline(iso) {
+export function formatDeadline(iso, t, now = new Date()) {
   if (!iso) return null;
   const d = new Date(iso);
   if (isNaN(d.getTime())) return null;
-  const now = new Date();
   const pad = n => String(n).padStart(2, "0");
   const time    = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const dateStr = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`;
-  if (d < now)                               return { text: "просрочено",       color: "#F44336" };
-  if (d.toDateString() === now.toDateString()) return { text: `сегодня ${time}`, color: "#FB8C00" };
+  if (d < now)                               return { text: t("deadline.overdue"), color: "#F44336" };
+  if (d.toDateString() === now.toDateString()) return { text: t("deadline.todayAt", { time }), color: "#FB8C00" };
   const tom = new Date(now); tom.setDate(tom.getDate() + 1);
-  if (d.toDateString() === tom.toDateString()) return { text: `завтра ${time}`,  color: "#FFC107" };
+  if (d.toDateString() === tom.toDateString()) return { text: t("deadline.tomorrowAt", { time }), color: "#FFC107" };
   return { text: `${dateStr} ${time}`, color: null };
 }
 
@@ -122,7 +123,7 @@ export function countDirectKids(node) {
  * Возвращает все незавершённые задачи с дедлайном, разбитые по бакетам:
  * "overdue" / "today" / "week".
  */
-export function collectByDeadline(maps, now = new Date()) {
+export function collectByDeadline(maps, now = new Date(), unnamed = "") {
   const todayEnd   = new Date(now); todayEnd.setHours(23, 59, 59, 999);
   const weekEnd    = new Date(now); weekEnd.setDate(weekEnd.getDate() + 7);
   const out = [];
@@ -138,7 +139,7 @@ export function collectByDeadline(maps, now = new Date()) {
           else if (d <= todayEnd)  bucket = "today";
           else if (d <= weekEnd)   bucket = "week";
           if (bucket) out.push({
-            id: node.id, text: node.text || "(без названия)",
+            id: node.id, text: node.text || unnamed,
             deadline: node.deadline, priority: node.priority,
             colorIdx: node.colorIdx, mapId: m.id, mapName: m.name,
             time: d.getTime(), bucket,
@@ -154,13 +155,13 @@ export function collectByDeadline(maps, now = new Date()) {
 }
 
 /** Возвращает все архивированные задачи по всем картам. */
-export function collectArchived(maps) {
+export function collectArchived(maps, unnamed = "") {
   const out = [];
   for (const m of maps) {
     if (!m?.tree) continue;
     const walk = (node) => {
       if (node.archived) {
-        out.push({ id: node.id, text: node.text || "(без названия)", colorIdx: node.colorIdx, mapId: m.id, mapName: m.name });
+        out.push({ id: node.id, text: node.text || unnamed, colorIdx: node.colorIdx, mapId: m.id, mapName: m.name });
       } else {
         for (const c of node.children || []) walk(c);
       }
@@ -171,14 +172,14 @@ export function collectArchived(maps) {
 }
 
 /** Возвращает незавершённые задачи с приоритетом, сгруппированные по уровню. */
-export function collectByPriority(maps) {
+export function collectByPriority(maps, unnamed = "") {
   const out = { high: [], medium: [], low: [] };
   for (const m of maps) {
     if (!m?.tree) continue;
     const walk = (node) => {
       if (!node.done && node.priority && out[node.priority]) {
         out[node.priority].push({
-          id: node.id, text: node.text || "(без названия)",
+          id: node.id, text: node.text || unnamed,
           colorIdx: node.colorIdx, mapId: m.id, mapName: m.name,
           deadline: node.deadline || null,
         });

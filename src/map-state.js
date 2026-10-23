@@ -23,8 +23,8 @@ export function editMapDetails(map, changes) {
   return [{ ...map, name, tree }, { name, tree }];
 }
 
-export function overlayMapSnapshot(id, data, pending, inFlight, defaultTree) {
-  const name = pending?.name ?? inFlight?.name ?? data.name ?? "Проект";
+export function overlayMapSnapshot(id, data, pending, inFlight, defaultTree, fallbackName = "") {
+  const name = pending?.name ?? inFlight?.name ?? data.name ?? fallbackName;
   return {
     id,
     name,

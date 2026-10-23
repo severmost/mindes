@@ -16,7 +16,7 @@ export default function BackgroundPanel({ theme, uid, bgUrl, isMobile, onClose }
     setError(null);
     setSaving(true);
     try { await fn(); onClose(); }
-    catch (e) { setError(e.message || t("common.error")); }
+    catch (e) { console.error("[Mindes] background update failed", e); setError(t("bg.saveError")); }
     finally   { setSaving(false); }
   };
 

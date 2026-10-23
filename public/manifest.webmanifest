@@ -1,7 +1,6 @@
 {
   "name": "Mindes",
   "short_name": "Mindes",
-  "description": "Простые mindmap-задачи с синхронизацией",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#5b3fc4",

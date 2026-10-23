@@ -1,9 +1,10 @@
 import { Component } from "react";
 import { BRAND_COLOR } from "./utils";
+import { useLocale } from "./i18n.jsx";
 
 // Error Boundary — перехватывает JS-ошибки в дочерних компонентах
 // и показывает понятный экран вместо белого пустого окна.
-export default class ErrorBoundary extends Component {
+class ErrorBoundaryView extends Component {
   constructor(props) {
     super(props);
     this.state = { error: null };
@@ -33,7 +34,7 @@ export default class ErrorBoundary extends Component {
       }}>
         <div style={{ fontSize: 40 }}>⚠️</div>
         <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>
-          Что-то пошло не так
+          {this.props.t("error.title")}
         </div>
         <div style={{
           fontSize: 13, color: "#888", maxWidth: 480,
@@ -53,9 +54,14 @@ export default class ErrorBoundary extends Component {
             cursor: "pointer",
           }}
         >
-          Перезагрузить
+          {this.props.t("error.reload")}
         </button>
       </div>
     );
   }
+}
+
+export default function ErrorBoundary({ children }) {
+  const { t } = useLocale();
+  return <ErrorBoundaryView t={t}>{children}</ErrorBoundaryView>;
 }

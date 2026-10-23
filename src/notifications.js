@@ -57,7 +57,7 @@ export async function scheduleReminder({ taskId, title, body, fireAt }) {
       await LocalNotifications.schedule({
         notifications: [{
           id,
-          title: title || "Напоминание",
+          title: title || "Mindes",
           body: body || "",
           // allowWhileIdle: true — alarm срабатывает даже в Doze-режиме,
           // когда устройство спит. Без него Android задерживает или глотает alarm.
@@ -80,7 +80,7 @@ export async function scheduleReminder({ taskId, title, body, fireAt }) {
       try {
         if (typeof window !== "undefined" && "Notification" in window
           && Notification.permission === "granted") {
-          new Notification(title || "Напоминание", { body: body || "" });
+          new Notification(title || "Mindes", { body: body || "" });
         }
       } catch {}
       webTimers.delete(taskId);

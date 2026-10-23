@@ -19,6 +19,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { useLocale } from "./i18n.jsx";
 import { applyMapChange, editMapTree, editMapDetails, overlayMapSnapshot, isMapWriteAcknowledged } from "./map-state.js";
 
 const SAVE_DEBOUNCE_MS = 500;
@@ -38,76 +39,8 @@ function defaultTree(name) {
   };
 }
 
-function sampleTree() {
-  const id = () => makeId();
-  return {
-    id: "root",
-    text: "Мои задачи",
-    done: false,
-    description: "",
-    checklist: [],
-    children: [
-      {
-        id: id(),
-        text: "Работа",
-        done: false,
-        description: "",
-        checklist: [],
-        colorIdx: 0,
-        children: [
-          {
-            id: id(),
-            text: "Отправить отчёт",
-            done: false,
-            description: "Финальный отчёт за Q1",
-            checklist: [
-              { id: id(), text: "Собрать данные", done: true },
-              { id: id(), text: "Оформить таблицы", done: false },
-            ],
-            children: [],
-          },
-          { id: id(), text: "Созвон с командой", done: true, description: "", checklist: [], children: [] },
-        ],
-      },
-      {
-        id: id(),
-        text: "Учёба",
-        done: false,
-        description: "",
-        checklist: [],
-        colorIdx: 1,
-        children: [
-          { id: id(), text: "Прочитать главу 5", done: false, description: "", checklist: [], children: [] },
-        ],
-      },
-      {
-        id: id(),
-        text: "Личное",
-        done: false,
-        description: "",
-        checklist: [],
-        colorIdx: 2,
-        children: [
-          {
-            id: id(),
-            text: "Купить продукты",
-            done: false,
-            description: "",
-            checklist: [
-              { id: id(), text: "Молоко", done: false },
-              { id: id(), text: "Хлеб", done: false },
-              { id: id(), text: "Яйца", done: false },
-            ],
-            children: [],
-          },
-          { id: id(), text: "Тренировка", done: false, description: "", checklist: [], children: [] },
-        ],
-      },
-    ],
-  };
-}
-
 export function useFirestoreSync(user) {
+  const { t } = useLocale();
   const [maps, setMaps] = useState([]);
   const [activeMapId, setActiveMapId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -167,7 +100,7 @@ export function useFirestoreSync(user) {
           const pending = local?.uid === user.uid ? local : null;
           const inFlight = inFlightRef.current.get(d.id)?.uid === user.uid
             ? inFlightRef.current.get(d.id) : null;
-          return overlayMapSnapshot(d.id, data, pending, inFlight, defaultTree);
+          return overlayMapSnapshot(d.id, data, pending, inFlight, defaultTree, t("common.untitled"));
         });
         for (const entry of optimisticMapsRef.current.values()) {
           if (entry.uid === user.uid) list.push(entry.map);
@@ -188,7 +121,7 @@ export function useFirestoreSync(user) {
       }
     );
     return () => { subscribed = false; unsub(); };
-  }, [user, mapsColRef]);
+  }, [user, mapsColRef, t]);
 
   // Подписка на activeMapId
   useEffect(() => {
@@ -302,7 +235,7 @@ export function useFirestoreSync(user) {
   async function addMap() {
     if (!user) return;
     const id = makeId();
-    const name = "Новый проект";
+    const name = t("home.defaultProject");
     const tree = defaultTree(name);
     optimisticMapsRef.current.set(id, { uid: user.uid, map: { id, name, tree } });
     const nextMaps = [...mapsRef.current, { id, name, tree }];

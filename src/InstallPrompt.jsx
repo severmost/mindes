@@ -90,9 +90,9 @@ export default function InstallPrompt({ theme }) {
           </div>
           {mode === "ios" ? (
             <div style={{ fontSize: 13, color: theme.textDim, lineHeight: 1.5 }}>
-              Нажмите{" "}
+              {t("install.tap")}{" "}
               <span style={{ fontWeight: 600, color: theme.text }}>
-                Поделиться <ShareIcon />
+                {t("install.share")} <ShareIcon />
               </span>{" "}
               → <span style={{ fontWeight: 600, color: theme.text }}>{t("install.iosHint")}</span>
             </div>

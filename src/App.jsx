@@ -60,7 +60,7 @@ export default function App() {
   const { theme }                 = themeApi;
   const [showBgPanel, setShowBgPanel] = useState(false);
   const onboarding = useOnboarding();
-  const { t }   = useLocale();
+  const { t, locale } = useLocale();
   const winW     = useWindowWidth();
   const isMobile = winW < 768;
 
@@ -79,13 +79,13 @@ export default function App() {
     for (const m of sync.maps || []) {
       if (!m?.tree) continue;
       const tasks = collectTasksWithReminders(m.tree);
-      for (const t of tasks) {
-        const fireAt = new Date(new Date(t.deadline).getTime() - t.remindBefore * 60_000);
+      for (const task of tasks) {
+        const fireAt = new Date(new Date(task.deadline).getTime() - task.remindBefore * 60_000);
         if (!Number.isFinite(fireAt.getTime()) || fireAt.getTime() <= Date.now()) continue;
-        nextIds.add(t.id);
+        nextIds.add(task.id);
         scheduleReminder({
-          taskId: t.id, title: t.text || "Задача",
-          body: `Срок ${new Date(t.deadline).toLocaleString()}`, fireAt,
+          taskId: task.id, title: task.text || t("notification.task"),
+          body: t("notification.due", { date: new Date(task.deadline).toLocaleString(locale) }), fireAt,
         });
       }
     }
@@ -93,7 +93,7 @@ export default function App() {
       if (!nextIds.has(id)) cancelReminder(id);
     }
     lastReminderIdsRef.current = nextIds;
-  }, [sync.maps]);
+  }, [sync.maps, locale, t]);
 
   // ── Парсим маршрут ──
   // /           → ProjectsHome
