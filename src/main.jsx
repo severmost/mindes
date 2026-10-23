@@ -8,7 +8,7 @@ import { LocaleProvider } from "./i18n.jsx";
 // Service Worker — только для веба (не в Capacitor native)
 if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => {});
   });
 }
 

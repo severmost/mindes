@@ -1,6 +1,6 @@
 // Service Worker — Mindes PWA
-const CACHE = "mindes-v4";
-const SHELL = ["/", "/index.html"];
+const CACHE = "mindes-v5";
+const SHELL = ["/", "/index.html", "/privacy.html"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();
@@ -33,19 +33,20 @@ self.addEventListener("fetch", e => {
     request.url.includes("gstatic")
   ) return;
 
-  // Навигационные запросы (переход по URL, рефреш) → всегда отдаём index.html
-  // Это ключевой момент для SPA: /projectId, /projectId/taskId → index.html
+  // Навигация сначала получает свежую страницу из сети; кеш нужен для офлайна.
+  // Маршруты SPA ведут на index.html, отдельная privacy.html остаётся документом.
   if (request.mode === "navigate") {
     e.respondWith(
-      caches.open(CACHE).then(cache =>
-        cache.match("/index.html").then(cached => {
-          const network = fetch("/index.html").then(res => {
-            if (res && res.status === 200) cache.put("/index.html", res.clone());
-            return res;
-          }).catch(() => cached);
-          return cached || network;
-        })
-      )
+      caches.open(CACHE).then(async cache => {
+        const page = new URL(request.url).pathname === "/privacy.html" ? "/privacy.html" : "/index.html";
+        try {
+          const response = await fetch(page, { cache: "no-store" });
+          if (response.ok) await cache.put(page, response.clone());
+          return response;
+        } catch {
+          return (await cache.match(page)) || Response.error();
+        }
+      })
     );
     return;
   }
